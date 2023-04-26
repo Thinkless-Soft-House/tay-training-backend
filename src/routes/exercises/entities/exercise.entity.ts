@@ -1,5 +1,7 @@
 import { CoreEntity } from 'src/core/models/CoreEntity.model';
-import { Column, Entity } from 'typeorm';
+import { ExerciseConfiguration } from 'src/routes/exercise-configurations/entities/exercise-configuration.entity';
+import { ExerciseMethod } from 'src/routes/exercise-method/entities/exercise-method.entity';
+import { Column, Entity, OneToMany, Relation } from 'typeorm';
 
 @Entity({ name: 'exercises' })
 export class Exercise extends CoreEntity {
@@ -15,7 +17,14 @@ export class Exercise extends CoreEntity {
   @Column({ name: 'has_method', type: 'boolean', default: true })
   hasMethod: boolean;
 
-  // Exercise Configuration FK
-  // @Column({ name: 'exercise_configuration_id', type: 'int', nullable: true })
-  // exerciseConfigurationId: number;
+  // FK's
+
+  // Relations
+
+  @OneToMany(
+    () => ExerciseConfiguration,
+    (exerciseConfiguration) => exerciseConfiguration.exercise,
+    {},
+  )
+  exerciseConfigurations: Relation<ExerciseConfiguration[]>;
 }

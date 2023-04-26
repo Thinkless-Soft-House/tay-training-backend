@@ -12,6 +12,12 @@ export function translateErrorMessage(message: string): string {
   ) {
     return 'Valor nulo em coluna. A operação viola a restrição de não nulo.';
   }
+  if (
+    message.includes('violates foreign key constraint') &&
+    message.includes('insert or update on table')
+  ) {
+    return 'A tentativa de salvar/atualizar o item falhou, verique se os dados relacionados existem.';
+  }
   // Adicione mais condições para traduzir outras mensagens de erro
   return message;
 }

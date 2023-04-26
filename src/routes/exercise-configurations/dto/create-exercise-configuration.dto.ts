@@ -2,6 +2,7 @@ export class CreateExerciseConfigurationDto {
   series: string;
   reps: string;
   rest: string;
-  exerciseGroupId: number;
+  exerciseMethodId: number;
   exerciseId: number;
+  methodId: number;
 }

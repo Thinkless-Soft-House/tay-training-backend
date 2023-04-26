@@ -1,5 +1,7 @@
 import { CoreEntity } from 'src/core/models/CoreEntity.model';
-import { Column, Entity } from 'typeorm';
+import { ExerciseConfiguration } from 'src/routes/exercise-configurations/entities/exercise-configuration.entity';
+import { ExerciseMethod } from 'src/routes/exercise-method/entities/exercise-method.entity';
+import { Column, Entity, OneToMany, Relation } from 'typeorm';
 
 @Entity('methods')
 export class Method extends CoreEntity {
@@ -8,4 +10,22 @@ export class Method extends CoreEntity {
 
   @Column({ name: 'description', type: 'text' })
   description: string;
+
+  // FK's
+
+  // Relations
+
+  @OneToMany(
+    () => ExerciseConfiguration,
+    (exerciseConfiguration) => exerciseConfiguration.method,
+    {},
+  )
+  exerciseConfigurations: Relation<ExerciseConfiguration[]>;
+
+  // @OneToMany(
+  //   () => ExerciseMethod,
+  //   (exerciseMethod: ExerciseMethod) => exerciseMethod.method,
+  //   {},
+  // )
+  // exerciseMethods: Relation<ExerciseMethod[]>;
 }
