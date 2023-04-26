@@ -1,26 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { CreateTrainingSheetDto } from './dto/create-training-sheet.dto';
-import { UpdateTrainingSheetDto } from './dto/update-training-sheet.dto';
+import { TrainingSheet } from './entities/training-sheet.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { CoreService } from 'src/core/utils/core-service.service';
+import { Repository } from 'typeorm';
 
 @Injectable()
-export class TrainingSheetService {
-  create(createTrainingSheetDto: CreateTrainingSheetDto) {
-    return 'This action adds a new trainingSheet';
-  }
-
-  findAll() {
-    return `This action returns all trainingSheet`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} trainingSheet`;
-  }
-
-  update(id: number, updateTrainingSheetDto: UpdateTrainingSheetDto) {
-    return `This action updates a #${id} trainingSheet`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} trainingSheet`;
+export class TrainingSheetService extends CoreService<TrainingSheet> {
+  constructor(
+    @InjectRepository(TrainingSheet)
+    trainingSheetRepository: Repository<TrainingSheet>,
+  ) {
+    super(trainingSheetRepository);
   }
 }

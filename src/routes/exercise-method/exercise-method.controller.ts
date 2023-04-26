@@ -1,45 +1,18 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { ExerciseMethodService } from './exercise-method.service';
 import { CreateExerciseMethodDto } from './dto/create-exercise-method.dto';
 import { UpdateExerciseMethodDto } from './dto/update-exercise-method.dto';
+import { ExerciseMethod } from './entities/exercise-method.entity';
+import { CoreController } from 'src/core/utils/core-controller.controller';
 
 @Controller('exercise-method')
-export class ExerciseMethodController {
-  constructor(private readonly exerciseMethodService: ExerciseMethodService) {}
-
-  @Post()
-  create(@Body() createExerciseMethodDto: CreateExerciseMethodDto) {
-    return this.exerciseMethodService.create(createExerciseMethodDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.exerciseMethodService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.exerciseMethodService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateExerciseMethodDto: UpdateExerciseMethodDto,
-  ) {
-    return this.exerciseMethodService.update(+id, updateExerciseMethodDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.exerciseMethodService.remove(+id);
+export class ExerciseMethodController extends CoreController<
+  ExerciseMethod,
+  ExerciseMethodService,
+  CreateExerciseMethodDto,
+  UpdateExerciseMethodDto
+> {
+  constructor(private readonly exerciseMethodService: ExerciseMethodService) {
+    super(exerciseMethodService);
   }
 }

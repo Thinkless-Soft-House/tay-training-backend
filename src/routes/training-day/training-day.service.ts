@@ -1,26 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { CreateTrainingDayDto } from './dto/create-training-day.dto';
-import { UpdateTrainingDayDto } from './dto/update-training-day.dto';
+import { TrainingDay } from './entities/training-day.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { CoreService } from 'src/core/utils/core-service.service';
+import { Repository } from 'typeorm';
 
 @Injectable()
-export class TrainingDayService {
-  create(createTrainingDayDto: CreateTrainingDayDto) {
-    return 'This action adds a new trainingDay';
-  }
-
-  findAll() {
-    return `This action returns all trainingDay`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} trainingDay`;
-  }
-
-  update(id: number, updateTrainingDayDto: UpdateTrainingDayDto) {
-    return `This action updates a #${id} trainingDay`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} trainingDay`;
+export class TrainingDayService extends CoreService<TrainingDay> {
+  constructor(
+    @InjectRepository(TrainingDay)
+    trainingDaysRepository: Repository<TrainingDay>,
+  ) {
+    super(trainingDaysRepository);
   }
 }

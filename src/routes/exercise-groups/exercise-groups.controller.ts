@@ -1,34 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { ExerciseGroupsService } from './exercise-groups.service';
 import { CreateExerciseGroupDto } from './dto/create-exercise-group.dto';
 import { UpdateExerciseGroupDto } from './dto/update-exercise-group.dto';
+import { CoreController } from 'src/core/utils/core-controller.controller';
+import { ExerciseGroup } from './entities/exercise-group.entity';
 
 @Controller('exercise-groups')
-export class ExerciseGroupsController {
-  constructor(private readonly exerciseGroupsService: ExerciseGroupsService) {}
-
-  @Post()
-  create(@Body() createExerciseGroupDto: CreateExerciseGroupDto) {
-    return this.exerciseGroupsService.create(createExerciseGroupDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.exerciseGroupsService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.exerciseGroupsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateExerciseGroupDto: UpdateExerciseGroupDto) {
-    return this.exerciseGroupsService.update(+id, updateExerciseGroupDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.exerciseGroupsService.remove(+id);
+export class ExerciseGroupsController extends CoreController<
+  ExerciseGroup,
+  ExerciseGroupsService,
+  CreateExerciseGroupDto,
+  UpdateExerciseGroupDto
+> {
+  constructor(private readonly exerciseGroupsService: ExerciseGroupsService) {
+    super(exerciseGroupsService);
   }
 }
