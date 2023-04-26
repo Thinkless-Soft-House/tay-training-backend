@@ -4,7 +4,7 @@ import { UpdateExerciseDto } from './dto/update-exercise.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Exercise } from './entities/exercise.entity';
-import { translateTypeORMError } from 'src/core/utils/functions/typeorm.utils';
+import { translateTypeORMError } from 'src/core/functions/typeorm.utils';
 
 @Injectable()
 export class ExercisesService {

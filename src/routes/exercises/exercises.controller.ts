@@ -10,7 +10,7 @@ import {
 import { ExercisesService } from './exercises.service';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { UpdateExerciseDto } from './dto/update-exercise.dto';
-import { ErrorHandler } from 'src/core/utils/handlers/error-handler.handler';
+import { ErrorHandler } from 'src/core/handlers/error-handler.handler';
 
 @Controller('exercises')
 export class ExercisesController {

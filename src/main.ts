@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { TypeormErrorInterceptor } from './core/utils/inteceptors/typeorm-translation-interceptor';
+import { TypeormErrorInterceptor } from './core/inteceptors/typeorm-translation-interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
