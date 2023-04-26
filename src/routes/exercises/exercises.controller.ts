@@ -22,22 +22,42 @@ export class ExercisesController {
       const create$ = await this.exercisesService.create(createExerciseDto);
       return create$;
     } catch (error) {
-      throw new ErrorHandler(error.message, 400, 400);
+      throw new ErrorHandler(
+        error.message,
+        error.response?.errorCode || 400,
+        error.response?.statusCode || 400,
+      );
     }
   }
 
   @Get()
   async findAll() {
-    return this.exercisesService.findAll();
+    try {
+      return this.exercisesService.findAll();
+    } catch (error) {
+      throw new ErrorHandler(
+        error.message,
+        error.response?.errorCode || 400,
+        error.response?.statusCode || 400,
+      );
+    }
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    const exercise = await this.exercisesService.findOne(+id);
-    if (!exercise) {
-      throw new ErrorHandler('Exercicio não encontrado', 404, 404);
+    try {
+      const exercise = await this.exercisesService.findOne(+id);
+      if (!exercise) {
+        throw new ErrorHandler('Exercicio não encontrado', 404, 404);
+      }
+      return exercise;
+    } catch (error) {
+      throw new ErrorHandler(
+        error.message,
+        error.response?.errorCode || 400,
+        error.response?.statusCode || 400,
+      );
     }
-    return exercise;
   }
 
   @Patch(':id')
@@ -50,15 +70,26 @@ export class ExercisesController {
         +id,
         updateExerciseDto,
       );
-
       return update$;
     } catch (error) {
-      throw new ErrorHandler(error.message, 400, 400);
+      throw new ErrorHandler(
+        error.message,
+        error.response?.errorCode || 400,
+        error.response?.statusCode || 400,
+      );
     }
   }
 
   @Delete(':id')
   async remove(@Param('id') id: string) {
-    return this.exercisesService.remove(+id);
+    try {
+      return this.exercisesService.remove(+id);
+    } catch (error) {
+      throw new ErrorHandler(
+        error.message,
+        error.response?.errorCode || 400,
+        error.response?.statusCode || 400,
+      );
+    }
   }
 }

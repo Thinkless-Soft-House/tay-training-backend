@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Exercise } from './entities/exercise.entity';
 import { translateTypeORMError } from 'src/core/functions/typeorm.utils';
+import { ErrorHandler } from 'src/core/handlers/error-handler.handler';
 
 @Injectable()
 export class ExercisesService {
@@ -27,36 +28,62 @@ export class ExercisesService {
   }
 
   async findAll() {
-    return await this.exerciseRepository.find();
+    try {
+      // Create a new exercise
+      return await this.exerciseRepository.find();
+    } catch (error) {
+      throw translateTypeORMError(error);
+    }
   }
 
   async findOne(id: number) {
-    const exercise = await this.exerciseRepository.findOne({ where: { id } });
-    console.log(exercise);
+    try {
+      const exercise = await this.exerciseRepository.findOne({ where: { id } });
+      console.log(exercise);
 
-    return exercise;
+      return exercise;
+    } catch (error) {
+      throw translateTypeORMError(error);
+    }
   }
 
   async update(id: number, updateExerciseDto: UpdateExerciseDto) {
-    // Create a new exercise
-    console.log(updateExerciseDto);
-    const newExercise = this.exerciseRepository.create(updateExerciseDto);
-    console.log(newExercise);
-    // Save exercise in database
-    await this.exerciseRepository.update(id, newExercise);
+    try {
+      // Check if exercise exists
+      const exercise = await this.exerciseRepository.findOne({
+        where: { id },
+      });
 
-    // Get updated exercise
-    return await this.exerciseRepository.findOne({ where: { id } });
+      if (!exercise) {
+        throw new ErrorHandler('Item não encontrado', 404, 404);
+      }
+
+      // Create a new exercise
+      console.log(updateExerciseDto);
+      const newExercise = this.exerciseRepository.create(updateExerciseDto);
+      console.log(newExercise);
+      // Save exercise in database
+      await this.exerciseRepository.update(id, newExercise);
+
+      // Get updated exercise
+      return await this.exerciseRepository.findOne({ where: { id } });
+    } catch (error) {
+      throw translateTypeORMError(error);
+    }
   }
 
   remove(id: number) {
-    // Find exercise by id
-    const exercise = this.exerciseRepository.findOne({ where: { id } });
+    try {
+      // Find exercise by id
+      const exercise = this.exerciseRepository.findOne({ where: { id } });
 
-    // Delete exercise
-    this.exerciseRepository.delete(id);
+      // Delete exercise
+      this.exerciseRepository.delete(id);
 
-    // Return deleted exercise
-    return exercise;
+      // Return deleted exercise
+      return exercise;
+    } catch (error) {
+      throw translateTypeORMError(error);
+    }
   }
 }
