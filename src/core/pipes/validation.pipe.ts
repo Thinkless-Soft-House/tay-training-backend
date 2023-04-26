@@ -1,5 +1,5 @@
 import { PipeTransform, Injectable, ArgumentMetadata } from '@nestjs/common';
-import { validate } from 'class-validator';
+import { validate, validateOrReject } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
 import { ErrorHandler } from '../handlers/error-handler.handler';
 
@@ -10,11 +10,19 @@ export class ValidationPipe implements PipeTransform<any> {
       return value;
     }
     const object = plainToInstance(metatype, value);
-    const errors = await validate(object);
-    if (errors.length > 0) {
-      throw new ErrorHandler('Falha na validação dos dados', 400, 400);
+    try {
+      await validateOrReject(object, {
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        skipMissingProperties: false,
+        validationError: { target: false },
+      });
+      return value;
+    } catch (errors) {
+      throw new ErrorHandler('Falha na validação dos dados', 400, 400, {
+        errors,
+      });
     }
-    return value;
   }
 
   private toValidate(metatype: any): boolean {

@@ -6,12 +6,14 @@ export class ErrorHandler extends HttpException {
     message: string,
     errorCode: number,
     statusCode: HttpStatus = HttpStatus.BAD_REQUEST,
+    data: any = { ok: false },
   ) {
     super(
       {
         message,
         errorCode,
         statusCode,
+        data,
       },
       statusCode,
     );

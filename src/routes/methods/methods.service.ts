@@ -5,21 +5,22 @@ import { Method } from './entities/method.entity';
 import { Repository } from 'typeorm';
 import { translateTypeORMError } from 'src/core/functions/typeorm.utils';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ErrorHandler } from 'src/core/handlers/error-handler.handler';
 
 @Injectable()
 export class MethodsService {
   constructor(
     @InjectRepository(Method)
-    private exerciseRepository: Repository<Method>,
+    private methodRepository: Repository<Method>,
   ) {}
 
   async create(createMethodDto: CreateMethodDto) {
     try {
-      // Create a new exercise
-      const newMethod = this.exerciseRepository.create(createMethodDto);
+      // Create a new method
+      const newMethod = this.methodRepository.create(createMethodDto);
 
-      // Save exercise in database
-      await this.exerciseRepository.save(newMethod);
+      // Save method in database
+      await this.methodRepository.save(newMethod);
       return newMethod;
     } catch (error) {
       throw translateTypeORMError(error);
@@ -27,36 +28,62 @@ export class MethodsService {
   }
 
   async findAll() {
-    return await this.exerciseRepository.find();
+    try {
+      // Create a new method
+      return await this.methodRepository.find();
+    } catch (error) {
+      throw translateTypeORMError(error);
+    }
   }
 
   async findOne(id: number) {
-    const exercise = await this.exerciseRepository.findOne({ where: { id } });
-    console.log(exercise);
+    try {
+      const method = await this.methodRepository.findOne({ where: { id } });
+      console.log(method);
 
-    return exercise;
+      return method;
+    } catch (error) {
+      throw translateTypeORMError(error);
+    }
   }
 
   async update(id: number, updateMethodDto: UpdateMethodDto) {
-    // Create a new exercise
-    console.log(updateMethodDto);
-    const newMethod = this.exerciseRepository.create(updateMethodDto);
-    console.log(newMethod);
-    // Save exercise in database
-    await this.exerciseRepository.update(id, newMethod);
+    try {
+      // Check if method exists
+      const method = await this.methodRepository.findOne({
+        where: { id },
+      });
 
-    // Get updated exercise
-    return await this.exerciseRepository.findOne({ where: { id } });
+      if (!method) {
+        throw new ErrorHandler('Item não encontrado', 404, 404);
+      }
+
+      // Create a new method
+      console.log(updateMethodDto);
+      const newMethod = this.methodRepository.create(updateMethodDto);
+      console.log(newMethod);
+      // Save method in database
+      await this.methodRepository.update(id, newMethod);
+
+      // Get updated method
+      return await this.methodRepository.findOne({ where: { id } });
+    } catch (error) {
+      throw translateTypeORMError(error);
+    }
   }
 
   remove(id: number) {
-    // Find exercise by id
-    const exercise = this.exerciseRepository.findOne({ where: { id } });
+    try {
+      // Find method by id
+      const method = this.methodRepository.findOne({ where: { id } });
 
-    // Delete exercise
-    this.exerciseRepository.delete(id);
+      // Delete method
+      this.methodRepository.delete(id);
 
-    // Return deleted exercise
-    return exercise;
+      // Return deleted method
+      return method;
+    } catch (error) {
+      throw translateTypeORMError(error);
+    }
   }
 }
