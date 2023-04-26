@@ -26,7 +26,7 @@ export class ExerciseMethod extends CoreEntity {
   @ManyToOne(
     () => ExerciseGroup,
     (exerciseGroup: ExerciseGroup) => exerciseGroup.exerciseMethods,
-    {},
+    { onDelete: 'CASCADE' },
   )
   @JoinColumn({ name: 'exercise_group_id', referencedColumnName: 'id' })
   exerciseGroup: Relation<ExerciseGroup>;

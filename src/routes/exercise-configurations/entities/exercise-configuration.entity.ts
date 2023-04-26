@@ -1,16 +1,8 @@
 import { CoreEntity } from 'src/core/models/CoreEntity.model';
-import { ExerciseGroup } from 'src/routes/exercise-groups/entities/exercise-group.entity';
 import { ExerciseMethod } from 'src/routes/exercise-method/entities/exercise-method.entity';
 import { Exercise } from 'src/routes/exercises/entities/exercise.entity';
 import { Method } from 'src/routes/methods/entities/method.entity';
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  Relation,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, Relation } from 'typeorm';
 
 @Entity({ name: 'exercise_configurations' })
 export class ExerciseConfiguration extends CoreEntity {
@@ -38,6 +30,7 @@ export class ExerciseConfiguration extends CoreEntity {
   @ManyToOne(
     () => ExerciseMethod,
     (exerciseMethod: ExerciseMethod) => exerciseMethod.exerciseConfigurations,
+    { onDelete: 'CASCADE' },
   )
   @JoinColumn({ name: 'exercise_method_id', referencedColumnName: 'id' })
   exerciseMethod: Relation<ExerciseMethod>;
@@ -45,6 +38,7 @@ export class ExerciseConfiguration extends CoreEntity {
   @ManyToOne(
     () => Exercise,
     (exerciseMethod: Exercise) => exerciseMethod.exerciseConfigurations,
+    { onDelete: 'CASCADE' },
   )
   @JoinColumn({ name: 'exercise_id', referencedColumnName: 'id' })
   exercise: Relation<Exercise>;
@@ -52,6 +46,7 @@ export class ExerciseConfiguration extends CoreEntity {
   @ManyToOne(
     () => Method,
     (exerciseMethod: Method) => exerciseMethod.exerciseConfigurations,
+    { onDelete: 'CASCADE' },
   )
   @JoinColumn({ name: 'method_id', referencedColumnName: 'id' })
   method: Relation<Method>;

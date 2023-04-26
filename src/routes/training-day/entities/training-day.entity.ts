@@ -20,6 +20,7 @@ export class TrainingDay extends CoreEntity {
   @ManyToOne(
     () => TrainingSheet,
     (trainingSheet: TrainingSheet) => trainingSheet.trainingDays,
+    { onDelete: 'CASCADE' },
   )
   @JoinColumn({ name: 'training_sheet_id', referencedColumnName: 'id' })
   trainingSheet: Relation<TrainingSheet>;
@@ -27,6 +28,7 @@ export class TrainingDay extends CoreEntity {
   @ManyToOne(
     () => ExerciseGroup,
     (exerciseGroup: ExerciseGroup) => exerciseGroup.trainingDays,
+    { onDelete: 'CASCADE' },
   )
   @JoinColumn({ name: 'exercise_group_id', referencedColumnName: 'id' })
   exerciseGroup: Relation<ExerciseGroup>;
