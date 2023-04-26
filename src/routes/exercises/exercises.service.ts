@@ -39,8 +39,9 @@ export class ExercisesService {
 
   async update(id: number, updateExerciseDto: UpdateExerciseDto) {
     // Create a new exercise
+    console.log(updateExerciseDto);
     const newExercise = this.exerciseRepository.create(updateExerciseDto);
-
+    console.log(newExercise);
     // Save exercise in database
     await this.exerciseRepository.update(id, newExercise);
 

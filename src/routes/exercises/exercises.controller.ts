@@ -22,7 +22,6 @@ export class ExercisesController {
       const create$ = await this.exercisesService.create(createExerciseDto);
       return create$;
     } catch (error) {
-      console.log('error on create exercise', error);
       throw new ErrorHandler(error.message, 400, 400);
     }
   }
@@ -46,7 +45,16 @@ export class ExercisesController {
     @Param('id') id: string,
     @Body() updateExerciseDto: UpdateExerciseDto,
   ) {
-    return this.exercisesService.update(+id, updateExerciseDto);
+    try {
+      const update$ = await this.exercisesService.update(
+        +id,
+        updateExerciseDto,
+      );
+
+      return update$;
+    } catch (error) {
+      throw new ErrorHandler(error.message, 400, 400);
+    }
   }
 
   @Delete(':id')
