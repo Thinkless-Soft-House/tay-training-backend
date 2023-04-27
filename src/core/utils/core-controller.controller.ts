@@ -8,10 +8,12 @@ interface HasId {
 
 interface IsService {
   create(createDto: any): Promise<any>;
+  createMany(items: any[]): Promise<any>;
   findAll(relations?: string[]): Promise<any>;
   findByFilter(query: any): Promise<any>;
   findOne(id: number): Promise<any>;
   update(id: number, updateDto: any): Promise<any>;
+  updateMany(items: { id: number; data: any }[]): Promise<any>;
   remove(id: number): Promise<any>;
 }
 
@@ -27,6 +29,19 @@ export class CoreController<
   async create(@Body() createDto: CreateDTO) {
     try {
       const create$: Entity = await this.service.create(createDto);
+      return create$;
+    } catch (error) {
+      throw new ErrorHandler(
+        error.message,
+        error.response?.errorCode || 400,
+        error.response?.statusCode || 400,
+      );
+    }
+  }
+  @Post('/many')
+  async createMany(@Body() createDto: CreateDTO[]) {
+    try {
+      const create$: Entity = await this.service.createMany(createDto);
       return create$;
     } catch (error) {
       throw new ErrorHandler(
@@ -77,10 +92,23 @@ export class CoreController<
     }
   }
 
-  @Patch(':id')
+  @Patch('single/:id')
   async update(@Param('id') id: string, @Body() updateDto: UpdateDTO) {
     try {
       const update$: Entity = await this.service.update(+id, updateDto);
+      return update$;
+    } catch (error) {
+      throw new ErrorHandler(
+        error.message,
+        error.response?.errorCode || 400,
+        error.response?.statusCode || 400,
+      );
+    }
+  }
+  @Patch('many')
+  async updateMany(@Body() updateDto: { id: number; data: UpdateDTO }[]) {
+    try {
+      const update$: Entity = await this.service.updateMany(updateDto);
       return update$;
     } catch (error) {
       throw new ErrorHandler(

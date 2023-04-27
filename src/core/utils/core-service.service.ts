@@ -18,6 +18,20 @@ export class CoreService<T> {
     }
   }
 
+  async createMany(items: any[]) {
+    try {
+      items.map(async (item) => {
+        return this.create(item);
+      });
+      const res = await Promise.all(items);
+      console.log(res);
+      return res;
+    } catch (error) {
+      console.log(error);
+      throw translateTypeORMError(error);
+    }
+  }
+
   async findByFilter(query: any) {
     console.log(query);
     const where = {};
@@ -94,6 +108,19 @@ export class CoreService<T> {
 
       // Get updated item
       return await this.repository.findOne({ where: whereId });
+    } catch (error) {
+      throw translateTypeORMError(error);
+    }
+  }
+
+  async updateMany(items: { id: number; data: any }[]) {
+    try {
+      console.log('updateMany', items);
+      items.map(async (item) => {
+        return this.update(item.id, item.data);
+      });
+
+      return await Promise.all(items);
     } catch (error) {
       throw translateTypeORMError(error);
     }
