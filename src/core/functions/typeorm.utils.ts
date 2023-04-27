@@ -18,6 +18,9 @@ export function translateErrorMessage(message: string): string {
   ) {
     return 'A tentativa de salvar/atualizar o item falhou, verique se os dados relacionados existem.';
   }
+  if (message.includes('invalid input syntax for type')) {
+    return 'Algum tipo de valor está incorreto. A operação viola a restrição de tipo.';
+  }
   // Adicione mais condições para traduzir outras mensagens de erro
   return message;
 }

@@ -1,6 +1,6 @@
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { translateTypeORMError } from '../functions/typeorm.utils';
-import { ErrorHandler } from '../handlers/error-handler.handler';
+import { ErrorHandler } from '../handlers/error.handler';
 
 export class CoreService<T> {
   constructor(public repository: Repository<T>) {}
@@ -13,6 +13,38 @@ export class CoreService<T> {
       // Save item in database
       await this.repository.save(newItem);
       return newItem;
+    } catch (error) {
+      throw translateTypeORMError(error);
+    }
+  }
+
+  async findByFilter(query: any) {
+    console.log(query);
+    const where = {};
+    if (query.name) where['name'] = ILike(`%${query.name}%`);
+
+    if (query.description)
+      where['description'] = ILike(`%${query.description}%`);
+
+    if (query.videoUrl) where['videoUrl'] = ILike(`%${query.videoUrl}%`);
+
+    if (query.hasMethod) where['hasMethod'] = query.hasMethod;
+
+    try {
+      const results = await this.repository.findAndCount({
+        where,
+        relations: query.relations ? query.relations.split(',') : [],
+        take: query.take,
+        skip: query.skip,
+        order: {
+          [query.orderColumn || 'id']: query.order || 'ASC',
+        },
+      });
+
+      return {
+        data: results[0],
+        count: results[1],
+      };
     } catch (error) {
       throw translateTypeORMError(error);
     }

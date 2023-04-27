@@ -1,5 +1,6 @@
 import { Post, Body, Get, Param, Patch, Delete, Query } from '@nestjs/common';
-import { ErrorHandler } from '../handlers/error-handler.handler';
+import { ErrorHandler } from '../handlers/error.handler';
+import { createPaginationConfig } from '../handlers/pagination.handler';
 
 interface HasId {
   id: number;
@@ -8,6 +9,7 @@ interface HasId {
 interface IsService {
   create(createDto: any): Promise<any>;
   findAll(relations?: string[]): Promise<any>;
+  findByFilter(query: any): Promise<any>;
   findOne(id: number): Promise<any>;
   update(id: number, updateDto: any): Promise<any>;
   remove(id: number): Promise<any>;
@@ -49,6 +51,13 @@ export class CoreController<
         error.response?.statusCode || 400,
       );
     }
+  }
+
+  @Get('/filter')
+  findByFilter(@Query() query: any) {
+    const q = { ...query, ...createPaginationConfig(query) };
+    console.log(q);
+    return this.service.findByFilter(q);
   }
 
   @Get(':id')
