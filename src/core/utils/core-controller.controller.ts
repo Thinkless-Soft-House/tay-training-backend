@@ -1,4 +1,4 @@
-import { Post, Body, Get, Param, Patch, Delete } from '@nestjs/common';
+import { Post, Body, Get, Param, Patch, Delete, Query } from '@nestjs/common';
 import { ErrorHandler } from '../handlers/error-handler.handler';
 
 interface HasId {
@@ -7,7 +7,7 @@ interface HasId {
 
 interface IsService {
   create(createDto: any): Promise<any>;
-  findAll(): Promise<any>;
+  findAll(relations?: string[]): Promise<any>;
   findOne(id: number): Promise<any>;
   update(id: number, updateDto: any): Promise<any>;
   remove(id: number): Promise<any>;
@@ -36,9 +36,12 @@ export class CoreController<
   }
 
   @Get()
-  async findAll(): Promise<Entity[]> {
+  async findAll(@Query() query: any): Promise<Entity[]> {
     try {
-      return this.service.findAll();
+      const relations: string[] = (query.relations as string)
+        ? query.relations.split(',')
+        : [];
+      return this.service.findAll(relations);
     } catch (error) {
       throw new ErrorHandler(
         error.message,

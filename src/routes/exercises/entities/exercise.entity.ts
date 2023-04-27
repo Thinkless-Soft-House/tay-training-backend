@@ -1,6 +1,5 @@
 import { CoreEntity } from 'src/core/models/CoreEntity.model';
 import { ExerciseConfiguration } from 'src/routes/exercise-configurations/entities/exercise-configuration.entity';
-import { ExerciseMethod } from 'src/routes/exercise-method/entities/exercise-method.entity';
 import { Column, Entity, OneToMany, Relation } from 'typeorm';
 
 @Entity({ name: 'exercises' })

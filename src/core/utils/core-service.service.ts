@@ -18,10 +18,13 @@ export class CoreService<T> {
     }
   }
 
-  async findAll() {
+  async findAll(relations?: string[]) {
     try {
       // Create a new item
-      return await this.repository.find();
+      const rel = relations ? relations : [];
+      return await this.repository.find({
+        relations: rel,
+      });
     } catch (error) {
       throw translateTypeORMError(error);
     }
