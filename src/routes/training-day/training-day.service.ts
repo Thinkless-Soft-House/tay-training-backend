@@ -12,4 +12,13 @@ export class TrainingDayService extends CoreService<TrainingDay> {
   ) {
     super(trainingDaysRepository);
   }
+
+  override createWhere(query: any) {
+    const where = {};
+    if (query.day) where['day'] = query.day;
+    if (query.trainingSheetId) where['trainingSheetId'] = query.trainingSheetId;
+    if (query.exerciseGroupId) where['exerciseGroupId'] = query.exerciseGroupId;
+
+    return where;
+  }
 }

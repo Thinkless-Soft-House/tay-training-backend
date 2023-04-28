@@ -5,6 +5,14 @@ import { ErrorHandler } from '../handlers/error.handler';
 export class CoreService<T> {
   constructor(public repository: Repository<T>) {}
 
+  createWhere(query: any) {
+    const where = {};
+
+    // Code here
+
+    return where;
+  }
+
   async create(createDto: any) {
     try {
       // Create a new item
@@ -34,15 +42,7 @@ export class CoreService<T> {
 
   async findByFilter(query: any) {
     console.log(query);
-    const where = {};
-    if (query.name) where['name'] = ILike(`%${query.name}%`);
-
-    if (query.description)
-      where['description'] = ILike(`%${query.description}%`);
-
-    if (query.videoUrl) where['videoUrl'] = ILike(`%${query.videoUrl}%`);
-
-    if (query.hasMethod) where['hasMethod'] = query.hasMethod;
+    const where = this.createWhere(query);
 
     try {
       const results = await this.repository.findAndCount({

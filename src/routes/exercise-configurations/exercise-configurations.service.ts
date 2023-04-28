@@ -12,4 +12,17 @@ export class ExerciseConfigurationsService extends CoreService<ExerciseConfigura
   ) {
     super(methodsRepository);
   }
+
+  override createWhere(query: any) {
+    const where = {};
+    if (query.series) where['series'] = query.series;
+    if (query.reps) where['reps'] = query.reps;
+    if (query.rest) where['rest'] = query.rest;
+    if (query.exerciseMethodId)
+      where['exerciseMethodId'] = query.exerciseMethodId;
+    if (query.exerciseId) where['exerciseId'] = query.exerciseId;
+    if (query.methodId) where['methodId'] = query.methodId;
+
+    return where;
+  }
 }
