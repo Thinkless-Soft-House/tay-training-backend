@@ -19,8 +19,8 @@ export class CoreService<T> {
       const newItem = this.repository.create(createDto);
 
       // Save item in database
-      await this.repository.save(newItem);
-      return newItem;
+      const create$ = await this.repository.save(newItem);
+      return create$;
     } catch (error) {
       throw translateTypeORMError(error);
     }
@@ -76,10 +76,14 @@ export class CoreService<T> {
     }
   }
 
-  async findOne(id: number) {
+  async findOne(id: number, relations?: string[]) {
     try {
       const whereId: any = { id };
-      const item = await this.repository.findOne({ where: whereId });
+      const rel = relations ? relations : [];
+      const item = await this.repository.findOne({
+        where: whereId,
+        relations: rel,
+      });
 
       return item;
     } catch (error) {

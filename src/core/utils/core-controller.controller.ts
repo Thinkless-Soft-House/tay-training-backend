@@ -11,7 +11,7 @@ interface IsService {
   createMany(items: any[]): Promise<any>;
   findAll(relations?: string[]): Promise<any>;
   findByFilter(query: any): Promise<any>;
-  findOne(id: number): Promise<any>;
+  findOne(id: number, relations?: string[]): Promise<any>;
   update(id: number, updateDto: any): Promise<any>;
   updateMany(items: { id: number; data: any }[]): Promise<any>;
   remove(id: number): Promise<any>;
@@ -71,14 +71,16 @@ export class CoreController<
   @Get('/filter')
   findByFilter(@Query() query: any) {
     const q = { ...query, ...createPaginationConfig(query) };
-    console.log(q);
     return this.service.findByFilter(q);
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string, @Query() query: any) {
     try {
-      const item: Entity | null = await this.service.findOne(+id);
+      const relations: string[] = (query.relations as string)
+        ? query.relations.split(',')
+        : [];
+      const item: Entity | null = await this.service.findOne(+id, relations);
       if (!item) {
         throw new ErrorHandler('Item não encontrado', 404, 404);
       }
