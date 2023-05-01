@@ -21,4 +21,10 @@ export class TrainingDayService extends CoreService<TrainingDay> {
 
     return where;
   }
+
+  getTrainingDaysByTrainingSheetId(trainingSheetId: number) {
+    return this.repository.find({
+      where: { trainingSheetId },
+    });
+  }
 }

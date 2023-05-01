@@ -105,7 +105,8 @@ export class CoreService<T> {
 
       // Create a new item
       console.log(updateDto);
-      const newItem: any = this.repository.create(updateDto);
+      const dto = { id, ...updateDto };
+      const newItem: any = this.repository.create(dto);
       console.log(newItem);
       // Save item in database
       await this.repository.update(id, newItem);

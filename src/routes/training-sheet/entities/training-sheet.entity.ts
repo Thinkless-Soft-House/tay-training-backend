@@ -14,7 +14,7 @@ export class TrainingSheet extends CoreEntity {
   @OneToMany(
     () => TrainingDay,
     (trainingDay: TrainingDay) => trainingDay.trainingSheet,
-    { cascade: true },
+    { cascade: true, onDelete: 'CASCADE' },
   )
   trainingDays: Relation<TrainingDay[]>;
 }

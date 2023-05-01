@@ -25,4 +25,10 @@ export class ExerciseConfigurationsService extends CoreService<ExerciseConfigura
 
     return where;
   }
+
+  getExerciseConfigurationsByExerciseMethodId(exerciseMethodId: number) {
+    return this.repository.find({
+      where: { exerciseMethodId },
+    });
+  }
 }
