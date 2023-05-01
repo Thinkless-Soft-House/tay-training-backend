@@ -27,7 +27,12 @@ AppModule = __decorate([
         imports: [
             exercises_module_1.ExercisesModule,
             methods_module_1.MethodsModule,
-            config_1.ConfigModule.forRoot({ isGlobal: true }),
+            config_1.ConfigModule.forRoot({
+                isGlobal: true,
+                envFilePath: process.env.NODE_ENV === 'production'
+                    ? '.env.production'
+                    : '.env.development',
+            }),
             typeorm_1.TypeOrmModule.forRootAsync({
                 imports: [config_1.ConfigModule],
                 useFactory: (configService) => {

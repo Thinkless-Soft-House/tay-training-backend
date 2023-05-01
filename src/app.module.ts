@@ -16,7 +16,13 @@ import createOrmconfig from './core/database/ormconfig';
   imports: [
     ExercisesModule,
     MethodsModule,
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath:
+        process.env.NODE_ENV === 'production'
+          ? '.env.production'
+          : '.env.development',
+    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
