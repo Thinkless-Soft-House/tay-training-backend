@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const path_1 = require("path");
 function createOrmConfig(connData) {
+    console.log('connData', connData);
     return {
         type: 'postgres',
         host: connData.host || 'localhost',

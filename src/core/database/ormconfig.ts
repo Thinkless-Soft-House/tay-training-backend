@@ -11,6 +11,7 @@ function createOrmConfig(connData: {
   database: string;
   synchronize: string;
 }): TypeOrmModuleOptions {
+  console.log('connData', connData);
   return {
     type: 'postgres',
     host: connData.host || 'localhost',
