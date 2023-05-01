@@ -21,19 +21,19 @@
 
 
 # Stage 1 - Build
-FROM node:18.12.1-alpine3.17 AS backend-build
+# FROM node:18.12.1-alpine3.17 AS backend-build
 
-WORKDIR /api
-COPY . .
-RUN npm i && npm run build
+# WORKDIR /api
+# COPY . .
+# RUN npm i && npm run build
 
 # Stage 2 - Run
 FROM node:18.12.1-alpine3.17
 
 WORKDIR /app
-COPY --from=backend-build /api/dist/ ./dist/
-COPY --from=backend-build /api/package.json .
-COPY --from=backend-build /api/package-lock.json .
-COPY --from=backend-build /api/node_modules/ ./node_modules/
+COPY /dist/ ./dist/
+# COPY /package.json .
+# COPY /package-lock.json .
+# COPY /node_modules/ ./node_modules/
 
 CMD [ "node", "dist/main.js" ]
