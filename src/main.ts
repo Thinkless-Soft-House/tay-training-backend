@@ -12,7 +12,12 @@ async function bootstrap() {
   // Pipes
   app.useGlobalPipes(new ValidationPipe());
 
-  app.enableCors();
+  app.enableCors({
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Content-Type, Authorization',
+    credentials: true,
+  });
   await app.listen(3000);
 }
 bootstrap();
