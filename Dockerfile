@@ -34,6 +34,6 @@ WORKDIR /app
 COPY /dist/ ./dist/
 COPY /package.json .
 COPY /package-lock.json .
-COPY /node_modules/ ./node_modules/
+# COPY /node_modules/ ./node_modules/
 
 CMD [ "node", "dist/main.js" ]
