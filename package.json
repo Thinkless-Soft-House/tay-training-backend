@@ -7,8 +7,9 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
-    "build:dev": "nest build",
-    "build:prod": "NODE_ENV=production nest build",
+    "build:development": "nest build",
+    "build:internal-docker": "nest build",
+    "build:production": "NODE_ENV=production nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
