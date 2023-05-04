@@ -12,8 +12,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ExerciseGroupCategoriesController = void 0;
 const common_1 = require("@nestjs/common");
 const exercise_group_categories_service_1 = require("./exercise-group-categories.service");
-let ExerciseGroupCategoriesController = class ExerciseGroupCategoriesController {
+const core_controller_controller_1 = require("../../core/utils/core-controller.controller");
+let ExerciseGroupCategoriesController = class ExerciseGroupCategoriesController extends core_controller_controller_1.CoreController {
     constructor(exerciseGroupCategoriesService) {
+        super(exerciseGroupCategoriesService);
         this.exerciseGroupCategoriesService = exerciseGroupCategoriesService;
     }
 };
