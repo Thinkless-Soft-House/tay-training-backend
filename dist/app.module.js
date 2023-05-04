@@ -19,6 +19,7 @@ const exercise_method_module_1 = require("./routes/exercise-method/exercise-meth
 const exercise_configurations_module_1 = require("./routes/exercise-configurations/exercise-configurations.module");
 const training_sheet_module_1 = require("./routes/training-sheet/training-sheet.module");
 const training_day_module_1 = require("./routes/training-day/training-day.module");
+const exercise_group_categories_module_1 = require("./routes/exercise-group-categories/exercise-group-categories.module");
 const ormconfig_1 = require("./core/database/ormconfig");
 let AppModule = class AppModule {
 };
@@ -31,7 +32,9 @@ AppModule = __decorate([
                 isGlobal: true,
                 envFilePath: process.env.NODE_ENV === 'production'
                     ? '.env.production'
-                    : '.env.development',
+                    : process.env.NODE_ENV === 'internal-docker'
+                        ? '.env.internal-docker'
+                        : '.env.development',
             }),
             typeorm_1.TypeOrmModule.forRootAsync({
                 imports: [config_1.ConfigModule],
@@ -53,6 +56,7 @@ AppModule = __decorate([
             exercise_configurations_module_1.ExerciseConfigurationsModule,
             training_sheet_module_1.TrainingSheetModule,
             training_day_module_1.TrainingDayModule,
+            exercise_group_categories_module_1.ExerciseGroupCategoriesModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ExerciseGroup = void 0;
+const exercise_group_category_entity_1 = require("../../exercise-group-categories/entities/exercise-group-category.entity");
 const CoreEntity_model_1 = require("../../../core/models/CoreEntity.model");
 const exercise_method_entity_1 = require("../../exercise-method/entities/exercise-method.entity");
 const training_day_entity_1 = require("../../training-day/entities/training-day.entity");
@@ -21,8 +22,9 @@ __decorate([
     __metadata("design:type", String)
 ], ExerciseGroup.prototype, "name", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'category', type: 'text' }),
-    __metadata("design:type", String)
+    (0, typeorm_1.ManyToOne)(() => exercise_group_category_entity_1.ExerciseGroupCategory, (exerciseGroupCategory) => exerciseGroupCategory.exerciseGroups, {}),
+    (0, typeorm_1.JoinColumn)({ name: 'category_id', referencedColumnName: 'id' }),
+    __metadata("design:type", Object)
 ], ExerciseGroup.prototype, "category", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => exercise_method_entity_1.ExerciseMethod, (exerciseMethod) => exerciseMethod.exerciseGroup, {}),

@@ -10,6 +10,7 @@ import { ExerciseMethodModule } from './routes/exercise-method/exercise-method.m
 import { ExerciseConfigurationsModule } from './routes/exercise-configurations/exercise-configurations.module';
 import { TrainingSheetModule } from './routes/training-sheet/training-sheet.module';
 import { TrainingDayModule } from './routes/training-day/training-day.module';
+import { ExerciseGroupCategoriesModule } from './routes/exercise-group-categories/exercise-group-categories.module';
 import createOrmconfig from './core/database/ormconfig';
 
 @Module({
@@ -21,6 +22,8 @@ import createOrmconfig from './core/database/ormconfig';
       envFilePath:
         process.env.NODE_ENV === 'production'
           ? '.env.production'
+          : process.env.NODE_ENV === 'internal-docker'
+          ? '.env.internal-docker'
           : '.env.development',
     }),
     TypeOrmModule.forRootAsync({
@@ -44,6 +47,7 @@ import createOrmconfig from './core/database/ormconfig';
     ExerciseConfigurationsModule,
     TrainingSheetModule,
     TrainingDayModule,
+    ExerciseGroupCategoriesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
