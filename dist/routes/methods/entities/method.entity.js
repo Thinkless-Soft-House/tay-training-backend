@@ -11,7 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Method = void 0;
 const CoreEntity_model_1 = require("../../../core/models/CoreEntity.model");
-const exercise_configuration_entity_1 = require("../../exercise-configurations/entities/exercise-configuration.entity");
+const exercise_method_entity_1 = require("../../exercise-method/entities/exercise-method.entity");
 const typeorm_1 = require("typeorm");
 let Method = class Method extends CoreEntity_model_1.CoreEntity {
 };
@@ -24,7 +24,7 @@ __decorate([
     __metadata("design:type", String)
 ], Method.prototype, "description", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => exercise_configuration_entity_1.ExerciseConfiguration, (exerciseConfiguration) => exerciseConfiguration.method, {}),
+    (0, typeorm_1.OneToMany)(() => exercise_method_entity_1.ExerciseMethod, (exerciseMethod) => exerciseMethod.method, {}),
     __metadata("design:type", Object)
 ], Method.prototype, "exerciseConfigurations", void 0);
 Method = __decorate([

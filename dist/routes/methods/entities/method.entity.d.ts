@@ -1,8 +1,8 @@
 import { CoreEntity } from 'src/core/models/CoreEntity.model';
-import { ExerciseConfiguration } from 'src/routes/exercise-configurations/entities/exercise-configuration.entity';
+import { ExerciseMethod } from 'src/routes/exercise-method/entities/exercise-method.entity';
 import { Relation } from 'typeorm';
 export declare class Method extends CoreEntity {
     name: string;
     description: string;
-    exerciseConfigurations: Relation<ExerciseConfiguration[]>;
+    exerciseConfigurations: Relation<ExerciseMethod[]>;
 }

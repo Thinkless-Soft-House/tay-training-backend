@@ -16,11 +16,11 @@ export class Method extends CoreEntity {
   // Relations
 
   @OneToMany(
-    () => ExerciseConfiguration,
-    (exerciseConfiguration) => exerciseConfiguration.method,
+    () => ExerciseMethod,
+    (exerciseMethod) => exerciseMethod.method,
     {},
   )
-  exerciseConfigurations: Relation<ExerciseConfiguration[]>;
+  exerciseConfigurations: Relation<ExerciseMethod[]>;
 
   // @OneToMany(
   //   () => ExerciseMethod,
