@@ -16,6 +16,9 @@ export class ExerciseMethod extends CoreEntity {
   @Column({ type: 'varchar', length: 255 })
   type: string;
 
+  @Column({ type: 'varchar', length: 255 })
+  rest: string;
+
   // FK's
 
   @Column({ name: 'exercise_group_id', type: 'int' })

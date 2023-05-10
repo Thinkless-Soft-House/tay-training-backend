@@ -12,9 +12,6 @@ export class ExerciseConfiguration extends CoreEntity {
   @Column({ name: 'repetitions', type: 'varchar', length: 255 })
   reps: string;
 
-  @Column({ type: 'varchar', length: 255 })
-  rest: string;
-
   // FK's
   @Column({ name: 'exercise_method_id' })
   exerciseMethodId: number;

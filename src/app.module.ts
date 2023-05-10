@@ -11,6 +11,7 @@ import { ExerciseConfigurationsModule } from './routes/exercise-configurations/e
 import { TrainingSheetModule } from './routes/training-sheet/training-sheet.module';
 import { TrainingDayModule } from './routes/training-day/training-day.module';
 import { ExerciseGroupCategoriesModule } from './routes/exercise-group-categories/exercise-group-categories.module';
+import { UsersModule } from './routes/users/users.module';
 import createOrmconfig from './core/database/ormconfig';
 
 @Module({
@@ -48,6 +49,7 @@ import createOrmconfig from './core/database/ormconfig';
     TrainingSheetModule,
     TrainingDayModule,
     ExerciseGroupCategoriesModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

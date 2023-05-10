@@ -4,6 +4,7 @@ import { ExerciseGroup } from 'src/routes/exercise-groups/entities/exercise-grou
 import { Relation } from 'typeorm';
 export declare class ExerciseMethod extends CoreEntity {
     type: string;
+    rest: string;
     exerciseGroupId: number;
     exerciseGroup: Relation<ExerciseGroup>;
     exerciseConfigurations: Relation<ExerciseConfiguration[]>;
