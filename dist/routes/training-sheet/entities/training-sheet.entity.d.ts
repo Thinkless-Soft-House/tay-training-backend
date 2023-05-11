@@ -3,5 +3,6 @@ import { TrainingDay } from 'src/routes/training-day/entities/training-day.entit
 import { Relation } from 'typeorm';
 export declare class TrainingSheet extends CoreEntity {
     name: string;
+    publicName: string;
     trainingDays: Relation<TrainingDay[]>;
 }

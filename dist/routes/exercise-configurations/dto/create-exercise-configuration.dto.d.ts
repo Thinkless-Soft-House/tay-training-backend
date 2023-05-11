@@ -3,5 +3,4 @@ export declare class CreateExerciseConfigurationDto {
     reps: string;
     exerciseMethodId: number;
     exerciseId: number;
-    methodId: number;
 }

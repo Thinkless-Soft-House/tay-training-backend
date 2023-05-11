@@ -19,6 +19,9 @@ export class ExerciseGroup extends CoreEntity {
   @Column({ name: 'category_id', type: 'text' })
   category_id: string;
 
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  publicName: string;
+
   // FK's
 
   // Relations

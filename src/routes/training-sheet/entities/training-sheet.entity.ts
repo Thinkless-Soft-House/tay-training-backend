@@ -6,6 +6,8 @@ import { Column, Entity, OneToMany, Relation } from 'typeorm';
 export class TrainingSheet extends CoreEntity {
   @Column({ type: 'varchar', length: 255 })
   name: string;
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  publicName: string;
 
   // FK's
 
