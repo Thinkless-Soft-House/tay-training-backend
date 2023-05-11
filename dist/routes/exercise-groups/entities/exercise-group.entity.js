@@ -22,6 +22,10 @@ __decorate([
     __metadata("design:type", String)
 ], ExerciseGroup.prototype, "name", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ name: 'category_id', type: 'text' }),
+    __metadata("design:type", String)
+], ExerciseGroup.prototype, "category_id", void 0);
+__decorate([
     (0, typeorm_1.ManyToOne)(() => exercise_group_category_entity_1.ExerciseGroupCategory, (exerciseGroupCategory) => exerciseGroupCategory.exerciseGroups, {}),
     (0, typeorm_1.JoinColumn)({ name: 'category_id', referencedColumnName: 'id' }),
     __metadata("design:type", Object)

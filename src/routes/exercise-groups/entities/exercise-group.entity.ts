@@ -16,8 +16,8 @@ export class ExerciseGroup extends CoreEntity {
   @Column({ name: 'name', type: 'varchar', length: 255 })
   name: string;
 
-  // @Column({ name: 'category', type: 'text' })
-  // category: string;
+  @Column({ name: 'category_id', type: 'text' })
+  category_id: string;
 
   // FK's
 

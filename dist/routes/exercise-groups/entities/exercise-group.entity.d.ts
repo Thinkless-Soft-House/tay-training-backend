@@ -5,6 +5,7 @@ import { TrainingDay } from 'src/routes/training-day/entities/training-day.entit
 import { Relation } from 'typeorm';
 export declare class ExerciseGroup extends CoreEntity {
     name: string;
+    category_id: string;
     category: Relation<ExerciseGroupCategory>;
     exerciseMethods: Relation<ExerciseMethod[]>;
     trainingDays: Relation<TrainingDay[]>;
