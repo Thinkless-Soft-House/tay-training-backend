@@ -28,6 +28,10 @@ let TrainingSheetService = class TrainingSheetService extends core_service_servi
         const where = {};
         if (query.name)
             where['name'] = (0, typeorm_2.ILike)(`%${query.name}%`);
+        if (query.publicName)
+            where['publicName'] = (0, typeorm_2.ILike)(`%${query.publicName}%`);
+        if (query.slug)
+            where['slug'] = `${query.slug}`;
         return where;
     }
     async create(createDto) {

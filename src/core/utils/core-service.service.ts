@@ -43,7 +43,7 @@ export class CoreService<T> {
   async findByFilter(query: any) {
     console.log(query);
     const where = this.createWhere(query);
-
+    console.log(where);
     try {
       const results = await this.repository.findAndCount({
         where,

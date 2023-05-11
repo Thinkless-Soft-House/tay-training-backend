@@ -38,6 +38,7 @@ class CoreService {
     async findByFilter(query) {
         console.log(query);
         const where = this.createWhere(query);
+        console.log(where);
         try {
             const results = await this.repository.findAndCount({
                 where,

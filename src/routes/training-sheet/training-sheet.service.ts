@@ -18,6 +18,8 @@ export class TrainingSheetService extends CoreService<TrainingSheet> {
   override createWhere(query: any) {
     const where = {};
     if (query.name) where['name'] = ILike(`%${query.name}%`);
+    if (query.publicName) where['publicName'] = ILike(`%${query.publicName}%`);
+    if (query.slug) where['slug'] = `${query.slug}`;
 
     return where;
   }
