@@ -13,14 +13,14 @@ export class CoreService<T> {
     return where;
   }
 
-  async create(createDto: any) {
+  async create(createDto: any): Promise<T> {
     try {
       // Create a new item
       const newItem = this.repository.create(createDto);
 
       // Save item in database
       const create$ = await this.repository.save(newItem);
-      return create$;
+      return create$[0];
     } catch (error) {
       throw translateTypeORMError(error);
     }

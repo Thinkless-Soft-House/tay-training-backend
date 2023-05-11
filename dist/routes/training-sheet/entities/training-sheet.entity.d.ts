@@ -4,5 +4,6 @@ import { Relation } from 'typeorm';
 export declare class TrainingSheet extends CoreEntity {
     name: string;
     publicName: string;
+    slug: string;
     trainingDays: Relation<TrainingDay[]>;
 }

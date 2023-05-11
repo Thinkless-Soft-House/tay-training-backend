@@ -3,7 +3,7 @@ export declare class CoreService<T> {
     repository: Repository<T>;
     constructor(repository: Repository<T>);
     createWhere(query: any): {};
-    create(createDto: any): Promise<T[]>;
+    create(createDto: any): Promise<T>;
     createMany(items: any[]): Promise<any[]>;
     findByFilter(query: any): Promise<{
         data: T[];

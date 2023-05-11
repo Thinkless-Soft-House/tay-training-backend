@@ -18,6 +18,8 @@ const training_sheet_entity_1 = require("./entities/training-sheet.entity");
 const typeorm_1 = require("@nestjs/typeorm");
 const core_service_service_1 = require("../../core/utils/core-service.service");
 const typeorm_2 = require("typeorm");
+const slugify_1 = require("slugify");
+const typeorm_utils_1 = require("../../core/functions/typeorm.utils");
 let TrainingSheetService = class TrainingSheetService extends core_service_service_1.CoreService {
     constructor(trainingSheetRepository) {
         super(trainingSheetRepository);
@@ -27,6 +29,23 @@ let TrainingSheetService = class TrainingSheetService extends core_service_servi
         if (query.name)
             where['name'] = (0, typeorm_2.ILike)(`%${query.name}%`);
         return where;
+    }
+    async create(createDto) {
+        try {
+            const data = Object.assign(Object.assign({}, createDto), { slug: (0, slugify_1.default)(createDto.name, { lower: true }) });
+            const newItem = this.repository.create(data);
+            const create$ = await this.repository.save(newItem);
+            const slug = (0, slugify_1.default)(`${create$.id}-${create$.name}`, {
+                lower: true,
+            });
+            await this.repository.update(create$.id, {
+                slug,
+            });
+            return Object.assign(Object.assign({}, create$), { slug });
+        }
+        catch (error) {
+            throw (0, typeorm_utils_1.translateTypeORMError)(error);
+        }
     }
 };
 TrainingSheetService = __decorate([

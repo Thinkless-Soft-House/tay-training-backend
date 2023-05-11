@@ -8,6 +8,8 @@ export class TrainingSheet extends CoreEntity {
   name: string;
   @Column({ type: 'varchar', length: 255, nullable: true })
   publicName: string;
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  slug: string;
 
   // FK's
 
