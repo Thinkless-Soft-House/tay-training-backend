@@ -25,9 +25,6 @@ export class ExerciseMethod extends CoreEntity {
   @Column({ name: 'exercise_group_id', type: 'int' })
   exerciseGroupId: number;
 
-  @Column({ name: 'method_id' })
-  methodId: number;
-
   // Relations
 
   @ManyToOne(
@@ -45,14 +42,6 @@ export class ExerciseMethod extends CoreEntity {
     {},
   )
   exerciseConfigurations: Relation<ExerciseConfiguration[]>;
-
-  @ManyToOne(
-    () => Method,
-    (exerciseMethod: Method) => exerciseMethod.exerciseConfigurations,
-    { onDelete: 'CASCADE' },
-  )
-  @JoinColumn({ name: 'method_id', referencedColumnName: 'id' })
-  method: Relation<Method>;
 
   // @ManyToOne(() => Method, (method: Method) => method.exerciseMethods)
   // @JoinColumn({ name: 'method_id', referencedColumnName: 'id' })

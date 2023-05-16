@@ -15,7 +15,7 @@ class CoreService {
         try {
             const newItem = this.repository.create(createDto);
             const create$ = await this.repository.save(newItem);
-            return create$[0];
+            return create$;
         }
         catch (error) {
             throw (0, typeorm_utils_1.translateTypeORMError)(error);

@@ -1,14 +1,11 @@
 import { ExerciseConfiguration } from './../../exercise-configurations/entities/exercise-configuration.entity';
 import { CoreEntity } from 'src/core/models/CoreEntity.model';
 import { ExerciseGroup } from 'src/routes/exercise-groups/entities/exercise-group.entity';
-import { Method } from 'src/routes/methods/entities/method.entity';
 import { Relation } from 'typeorm';
 export declare class ExerciseMethod extends CoreEntity {
     rest: string;
     observations: string;
     exerciseGroupId: number;
-    methodId: number;
     exerciseGroup: Relation<ExerciseGroup>;
     exerciseConfigurations: Relation<ExerciseConfiguration[]>;
-    method: Relation<Method>;
 }

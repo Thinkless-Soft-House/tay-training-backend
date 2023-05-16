@@ -13,7 +13,6 @@ exports.ExerciseMethod = void 0;
 const exercise_configuration_entity_1 = require("./../../exercise-configurations/entities/exercise-configuration.entity");
 const CoreEntity_model_1 = require("../../../core/models/CoreEntity.model");
 const exercise_group_entity_1 = require("../../exercise-groups/entities/exercise-group.entity");
-const method_entity_1 = require("../../methods/entities/method.entity");
 const typeorm_1 = require("typeorm");
 let ExerciseMethod = class ExerciseMethod extends CoreEntity_model_1.CoreEntity {
 };
@@ -30,10 +29,6 @@ __decorate([
     __metadata("design:type", Number)
 ], ExerciseMethod.prototype, "exerciseGroupId", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'method_id' }),
-    __metadata("design:type", Number)
-], ExerciseMethod.prototype, "methodId", void 0);
-__decorate([
     (0, typeorm_1.ManyToOne)(() => exercise_group_entity_1.ExerciseGroup, (exerciseGroup) => exerciseGroup.exerciseMethods, { onDelete: 'CASCADE' }),
     (0, typeorm_1.JoinColumn)({ name: 'exercise_group_id', referencedColumnName: 'id' }),
     __metadata("design:type", Object)
@@ -42,11 +37,6 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => exercise_configuration_entity_1.ExerciseConfiguration, (exerciseConfiguration) => exerciseConfiguration.exerciseMethod, {}),
     __metadata("design:type", Object)
 ], ExerciseMethod.prototype, "exerciseConfigurations", void 0);
-__decorate([
-    (0, typeorm_1.ManyToOne)(() => method_entity_1.Method, (exerciseMethod) => exerciseMethod.exerciseConfigurations, { onDelete: 'CASCADE' }),
-    (0, typeorm_1.JoinColumn)({ name: 'method_id', referencedColumnName: 'id' }),
-    __metadata("design:type", Object)
-], ExerciseMethod.prototype, "method", void 0);
 ExerciseMethod = __decorate([
     (0, typeorm_1.Entity)({ name: 'exercise_methods' })
 ], ExerciseMethod);

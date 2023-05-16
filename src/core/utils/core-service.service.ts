@@ -19,8 +19,8 @@ export class CoreService<T> {
       const newItem = this.repository.create(createDto);
 
       // Save item in database
-      const create$ = await this.repository.save(newItem);
-      return create$[0];
+      const create$: any = await this.repository.save(newItem);
+      return create$;
     } catch (error) {
       throw translateTypeORMError(error);
     }

@@ -26,8 +26,10 @@ let ExerciseGroupsService = class ExerciseGroupsService extends core_service_ser
         const where = {};
         if (query.name)
             where['name'] = (0, typeorm_2.ILike)(`%${query.name}%`);
+        if (query.publicName)
+            where['publicName'] = (0, typeorm_2.ILike)(`%${query.publicName}%`);
         if (query.category)
-            where['category'] = (0, typeorm_2.ILike)(`%${query.category}%`);
+            where['category_id'] = query.category;
         return where;
     }
 };

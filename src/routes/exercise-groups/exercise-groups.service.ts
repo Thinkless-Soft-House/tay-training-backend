@@ -17,8 +17,9 @@ export class ExerciseGroupsService extends CoreService<ExerciseGroup> {
   override createWhere(query: any) {
     const where = {};
     if (query.name) where['name'] = ILike(`%${query.name}%`);
+    if (query.publicName) where['publicName'] = ILike(`%${query.publicName}%`);
 
-    if (query.category) where['category'] = ILike(`%${query.category}%`);
+    if (query.category) where['category_id'] = query.category;
 
     return where;
   }
