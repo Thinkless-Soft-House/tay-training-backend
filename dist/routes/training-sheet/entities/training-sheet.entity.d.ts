@@ -5,5 +5,6 @@ export declare class TrainingSheet extends CoreEntity {
     name: string;
     publicName: string;
     slug: string;
+    offlinePdf: string;
     trainingDays: Relation<TrainingDay[]>;
 }

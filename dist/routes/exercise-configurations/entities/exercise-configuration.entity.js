@@ -34,7 +34,7 @@ __decorate([
     __metadata("design:type", Number)
 ], ExerciseConfiguration.prototype, "exerciseId", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'method_id' }),
+    (0, typeorm_1.Column)({ name: 'method_id', nullable: true }),
     __metadata("design:type", Number)
 ], ExerciseConfiguration.prototype, "methodId", void 0);
 __decorate([

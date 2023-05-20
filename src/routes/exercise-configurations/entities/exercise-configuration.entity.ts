@@ -19,7 +19,7 @@ export class ExerciseConfiguration extends CoreEntity {
   @Column({ name: 'exercise_id' })
   exerciseId: number;
 
-  @Column({ name: 'method_id' })
+  @Column({ name: 'method_id', nullable: true })
   methodId: number;
 
   // Relations
