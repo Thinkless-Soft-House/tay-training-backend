@@ -32,5 +32,10 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateTrainingSheetDto.prototype, "offlinePdf", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateTrainingSheetDto.prototype, "newTabPdf", void 0);
 exports.CreateTrainingSheetDto = CreateTrainingSheetDto;
 //# sourceMappingURL=create-training-sheet.dto.js.map

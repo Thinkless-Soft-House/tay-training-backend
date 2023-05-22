@@ -12,6 +12,8 @@ export class TrainingSheet extends CoreEntity {
   slug: string;
   @Column({ type: 'varchar', length: 255, nullable: true })
   offlinePdf: string;
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  newTabPdf: string;
 
   // FK's
 

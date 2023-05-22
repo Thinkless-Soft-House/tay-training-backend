@@ -32,6 +32,10 @@ __decorate([
     __metadata("design:type", String)
 ], TrainingSheet.prototype, "offlinePdf", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ type: 'varchar', length: 255, nullable: true }),
+    __metadata("design:type", String)
+], TrainingSheet.prototype, "newTabPdf", void 0);
+__decorate([
     (0, typeorm_1.OneToMany)(() => training_day_entity_1.TrainingDay, (trainingDay) => trainingDay.trainingSheet, { cascade: true, onDelete: 'CASCADE' }),
     __metadata("design:type", Object)
 ], TrainingSheet.prototype, "trainingDays", void 0);

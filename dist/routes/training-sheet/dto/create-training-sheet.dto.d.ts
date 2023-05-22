@@ -3,4 +3,5 @@ export declare class CreateTrainingSheetDto {
     publicName: string;
     slug: string;
     offlinePdf: string;
+    newTabPdf: string;
 }

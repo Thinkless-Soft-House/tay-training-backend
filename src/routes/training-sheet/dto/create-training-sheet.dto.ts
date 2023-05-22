@@ -15,4 +15,8 @@ export class CreateTrainingSheetDto {
   @IsOptional()
   @IsString()
   offlinePdf: string;
+
+  @IsOptional()
+  @IsString()
+  newTabPdf: string;
 }
