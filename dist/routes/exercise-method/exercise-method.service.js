@@ -18,6 +18,8 @@ const core_service_service_1 = require("../../core/utils/core-service.service");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const exercise_method_entity_1 = require("./entities/exercise-method.entity");
+const error_handler_1 = require("../../core/handlers/error.handler");
+const typeorm_utils_1 = require("../../core/functions/typeorm.utils");
 let ExerciseMethodService = class ExerciseMethodService extends core_service_service_1.CoreService {
     constructor(exerciseGroupRepository) {
         super(exerciseGroupRepository);
@@ -29,6 +31,22 @@ let ExerciseMethodService = class ExerciseMethodService extends core_service_ser
         if (query.exerciseGroupId)
             where['exerciseGroupId'] = query.exerciseGroupId;
         return where;
+    }
+    async clearByExerciseGroupId(exerciseGroupId) {
+        try {
+            const whereId = { exerciseGroupId };
+            const item = await this.repository.find({
+                where: whereId,
+            });
+            if (!item) {
+                throw new error_handler_1.ErrorHandler('Item não encontrado', 404, 404);
+            }
+            await this.repository.delete({ exerciseGroupId });
+            return item;
+        }
+        catch (error) {
+            throw (0, typeorm_utils_1.translateTypeORMError)(error);
+        }
     }
 };
 ExerciseMethodService = __decorate([

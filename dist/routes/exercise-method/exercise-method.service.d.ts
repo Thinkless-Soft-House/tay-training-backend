@@ -4,4 +4,5 @@ import { ExerciseMethod } from './entities/exercise-method.entity';
 export declare class ExerciseMethodService extends CoreService<ExerciseMethod> {
     constructor(exerciseGroupRepository: Repository<ExerciseMethod>);
     createWhere(query: any): {};
+    clearByExerciseGroupId(exerciseGroupId: number): Promise<ExerciseMethod[]>;
 }

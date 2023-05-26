@@ -6,4 +6,7 @@ import { CoreController } from 'src/core/utils/core-controller.controller';
 export declare class ExerciseMethodController extends CoreController<ExerciseMethod, ExerciseMethodService, CreateExerciseMethodDto, UpdateExerciseMethodDto> {
     private readonly exerciseMethodService;
     constructor(exerciseMethodService: ExerciseMethodService);
+    clearByExerciseGroupId(data: {
+        exerciseGroupId: number;
+    }): Promise<ExerciseMethod[]>;
 }

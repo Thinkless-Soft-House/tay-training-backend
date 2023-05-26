@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { ExerciseMethodService } from './exercise-method.service';
 import { CreateExerciseMethodDto } from './dto/create-exercise-method.dto';
 import { UpdateExerciseMethodDto } from './dto/update-exercise-method.dto';
@@ -14,5 +14,12 @@ export class ExerciseMethodController extends CoreController<
 > {
   constructor(private readonly exerciseMethodService: ExerciseMethodService) {
     super(exerciseMethodService);
+  }
+
+  @Post('/clear')
+  clearByExerciseGroupId(@Body() data: { exerciseGroupId: number }) {
+    return this.exerciseMethodService.clearByExerciseGroupId(
+      data.exerciseGroupId,
+    );
   }
 }

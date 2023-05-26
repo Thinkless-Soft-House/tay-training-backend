@@ -8,6 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ExerciseMethodController = void 0;
 const common_1 = require("@nestjs/common");
@@ -18,7 +21,17 @@ let ExerciseMethodController = class ExerciseMethodController extends core_contr
         super(exerciseMethodService);
         this.exerciseMethodService = exerciseMethodService;
     }
+    clearByExerciseGroupId(data) {
+        return this.exerciseMethodService.clearByExerciseGroupId(data.exerciseGroupId);
+    }
 };
+__decorate([
+    (0, common_1.Post)('/clear'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], ExerciseMethodController.prototype, "clearByExerciseGroupId", null);
 ExerciseMethodController = __decorate([
     (0, common_1.Controller)('exercise-method'),
     __metadata("design:paramtypes", [exercise_method_service_1.ExerciseMethodService])
