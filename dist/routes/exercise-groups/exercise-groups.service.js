@@ -23,13 +23,20 @@ let ExerciseGroupsService = class ExerciseGroupsService extends core_service_ser
         super(exerciseGroupsRepository);
     }
     createWhere(query) {
-        const where = {};
+        let where = {};
         if (query.name)
             where['name'] = (0, typeorm_2.ILike)(`%${query.name}%`);
         if (query.publicName)
             where['publicName'] = (0, typeorm_2.ILike)(`%${query.publicName}%`);
         if (query.category)
             where['category_id'] = query.category;
+        if (query.filter) {
+            const aux = where;
+            where = [
+                Object.assign(Object.assign({}, aux), { name: (0, typeorm_2.ILike)(`%${query.filter}%`) }),
+                Object.assign(Object.assign({}, aux), { category: (0, typeorm_2.ILike)(`%${query.filter}%`) }),
+            ];
+        }
         return where;
     }
 };

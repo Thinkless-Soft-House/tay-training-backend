@@ -14,15 +14,23 @@ export class ExercisesService extends CoreService<Exercise> {
   }
 
   override createWhere(query: any) {
-    const where = {};
-    if (query.name) where['name'] = ILike(`%${query.name}%`);
+    let where = {};
+    if (!query.filter) {
+      if (query.name) where['name'] = ILike(`%${query.name}%`);
 
-    if (query.description)
-      where['description'] = ILike(`%${query.description}%`);
+      if (query.description)
+        where['description'] = ILike(`%${query.description}%`);
 
-    if (query.videoUrl) where['videoUrl'] = ILike(`%${query.videoUrl}%`);
+      if (query.videoUrl) where['videoUrl'] = ILike(`%${query.videoUrl}%`);
 
-    if (query.hasMethod) where['hasMethod'] = query.hasMethod;
+      if (query.hasMethod) where['hasMethod'] = query.hasMethod;
+    } else {
+      const aux = where;
+      where = [
+        { ...aux, name: ILike(`%${query.filter}%`) },
+        { ...aux, description: ILike(`%${query.filter}%`) },
+      ];
+    }
 
     return where;
   }

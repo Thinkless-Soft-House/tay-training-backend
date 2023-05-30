@@ -24,15 +24,24 @@ let ExercisesService = class ExercisesService extends core_service_service_1.Cor
         this.exerciseRepository = exerciseRepository;
     }
     createWhere(query) {
-        const where = {};
-        if (query.name)
-            where['name'] = (0, typeorm_2.ILike)(`%${query.name}%`);
-        if (query.description)
-            where['description'] = (0, typeorm_2.ILike)(`%${query.description}%`);
-        if (query.videoUrl)
-            where['videoUrl'] = (0, typeorm_2.ILike)(`%${query.videoUrl}%`);
-        if (query.hasMethod)
-            where['hasMethod'] = query.hasMethod;
+        let where = {};
+        if (!query.filter) {
+            if (query.name)
+                where['name'] = (0, typeorm_2.ILike)(`%${query.name}%`);
+            if (query.description)
+                where['description'] = (0, typeorm_2.ILike)(`%${query.description}%`);
+            if (query.videoUrl)
+                where['videoUrl'] = (0, typeorm_2.ILike)(`%${query.videoUrl}%`);
+            if (query.hasMethod)
+                where['hasMethod'] = query.hasMethod;
+        }
+        else {
+            const aux = where;
+            where = [
+                Object.assign(Object.assign({}, aux), { name: (0, typeorm_2.ILike)(`%${query.filter}%`) }),
+                Object.assign(Object.assign({}, aux), { description: (0, typeorm_2.ILike)(`%${query.filter}%`) }),
+            ];
+        }
         return where;
     }
 };

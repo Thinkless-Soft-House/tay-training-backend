@@ -24,11 +24,18 @@ let MethodsService = class MethodsService extends core_service_service_1.CoreSer
         this.methodsRepository = methodsRepository;
     }
     createWhere(query) {
-        const where = {};
+        let where = {};
         if (query.name)
             where['name'] = (0, typeorm_1.ILike)(`%${query.name}%`);
         if (query.description)
             where['description'] = (0, typeorm_1.ILike)(`%${query.description}%`);
+        if (query.filter) {
+            const aux = where;
+            where = [
+                Object.assign(Object.assign({}, aux), { name: (0, typeorm_1.ILike)(`%${query.filter}%`) }),
+                Object.assign(Object.assign({}, aux), { description: (0, typeorm_1.ILike)(`%${query.filter}%`) }),
+            ];
+        }
         return where;
     }
 };

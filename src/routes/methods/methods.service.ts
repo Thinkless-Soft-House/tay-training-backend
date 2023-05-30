@@ -14,11 +14,19 @@ export class MethodsService extends CoreService<Method> {
   }
 
   override createWhere(query: any) {
-    const where = {};
+    let where = {};
     if (query.name) where['name'] = ILike(`%${query.name}%`);
 
     if (query.description)
       where['description'] = ILike(`%${query.description}%`);
+
+    if (query.filter) {
+      const aux = where;
+      where = [
+        { ...aux, name: ILike(`%${query.filter}%`) },
+        { ...aux, description: ILike(`%${query.filter}%`) },
+      ];
+    }
 
     return where;
   }

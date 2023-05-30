@@ -15,11 +15,19 @@ export class ExerciseGroupsService extends CoreService<ExerciseGroup> {
   }
 
   override createWhere(query: any) {
-    const where = {};
+    let where = {};
     if (query.name) where['name'] = ILike(`%${query.name}%`);
     if (query.publicName) where['publicName'] = ILike(`%${query.publicName}%`);
 
     if (query.category) where['category_id'] = query.category;
+
+    if (query.filter) {
+      const aux = where;
+      where = [
+        { ...aux, name: ILike(`%${query.filter}%`) },
+        { ...aux, category: ILike(`%${query.filter}%`) },
+      ];
+    }
 
     return where;
   }
