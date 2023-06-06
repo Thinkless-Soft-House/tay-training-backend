@@ -8,6 +8,7 @@ async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     app.useGlobalInterceptors(new typeorm_translation_interceptor_1.TypeormErrorInterceptor());
     app.useGlobalPipes(new validation_pipe_1.ValidationPipe());
+    app.setGlobalPrefix('api');
     app.enableCors({
         origin: '*',
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
