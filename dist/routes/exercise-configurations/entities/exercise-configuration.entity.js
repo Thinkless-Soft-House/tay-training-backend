@@ -26,11 +26,11 @@ __decorate([
     __metadata("design:type", String)
 ], ExerciseConfiguration.prototype, "reps", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'exercise_method_id' }),
+    (0, typeorm_1.Column)({ name: 'exercise_method_id', nullable: true }),
     __metadata("design:type", Number)
 ], ExerciseConfiguration.prototype, "exerciseMethodId", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'exercise_id' }),
+    (0, typeorm_1.Column)({ name: 'exercise_id', nullable: true }),
     __metadata("design:type", Number)
 ], ExerciseConfiguration.prototype, "exerciseId", void 0);
 __decorate([

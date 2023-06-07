@@ -11,5 +11,5 @@ export declare class ExerciseConfiguration extends CoreEntity {
     methodId: number;
     exerciseMethod: Relation<ExerciseMethod>;
     exercise: Relation<Exercise>;
-    method: Relation<Method>;
+    method: Relation<Method> | null;
 }

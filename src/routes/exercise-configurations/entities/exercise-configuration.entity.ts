@@ -13,10 +13,10 @@ export class ExerciseConfiguration extends CoreEntity {
   reps: string;
 
   // FK's
-  @Column({ name: 'exercise_method_id' })
+  @Column({ name: 'exercise_method_id', nullable: true })
   exerciseMethodId: number;
 
-  @Column({ name: 'exercise_id' })
+  @Column({ name: 'exercise_id', nullable: true })
   exerciseId: number;
 
   @Column({ name: 'method_id', nullable: true })
@@ -46,5 +46,5 @@ export class ExerciseConfiguration extends CoreEntity {
     { onDelete: 'CASCADE' },
   )
   @JoinColumn({ name: 'method_id', referencedColumnName: 'id' })
-  method: Relation<Method>;
+  method: Relation<Method> | null;
 }
