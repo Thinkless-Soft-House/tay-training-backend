@@ -23,10 +23,13 @@ class CoreService {
     }
     async createMany(items) {
         try {
-            items.map(async (item) => {
-                return this.create(item);
-            });
-            const res = await Promise.all(items);
+            const res = [];
+            for (const item of items) {
+                console.log('Criando...');
+                const r = await this.create(item);
+                console.log('Criado!');
+                res.push(r);
+            }
             console.log(res);
             return res;
         }

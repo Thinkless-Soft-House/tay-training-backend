@@ -28,10 +28,19 @@ export class CoreService<T> {
 
   async createMany(items: any[]) {
     try {
-      items.map(async (item) => {
-        return this.create(item);
-      });
-      const res = await Promise.all(items);
+      const res = [];
+      for (const item of items) {
+        console.log('Criando...');
+        const r = await this.create(item);
+        console.log('Criado!');
+        res.push(r);
+      }
+
+      // items.map(async (item) => {
+      //   return this.create(item);
+      // });
+
+      // const res = await Promise.all(items);
       console.log(res);
       return res;
     } catch (error) {

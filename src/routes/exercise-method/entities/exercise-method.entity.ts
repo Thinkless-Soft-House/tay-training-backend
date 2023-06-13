@@ -20,6 +20,9 @@ export class ExerciseMethod extends CoreEntity {
   @Column({ type: 'varchar', nullable: true })
   observations: string;
 
+  @Column({ type: 'int', nullable: true })
+  order: number;
+
   // FK's
 
   @Column({ name: 'exercise_group_id', type: 'int' })

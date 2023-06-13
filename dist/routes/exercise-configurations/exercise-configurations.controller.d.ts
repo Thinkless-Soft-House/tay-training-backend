@@ -7,7 +7,8 @@ export declare class ExerciseConfigurationsController extends CoreController<Exe
     private readonly exerciseConfigurationsService;
     constructor(exerciseConfigurationsService: ExerciseConfigurationsService);
     updateListOfExerciseGroups(body: ExerciseConfiguration[]): Promise<{
-        new: ExerciseConfiguration;
-        deleted: ExerciseConfiguration[];
+        new: number;
+        deleted: number;
+        updated: number;
     }>;
 }

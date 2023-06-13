@@ -25,6 +25,10 @@ __decorate([
     __metadata("design:type", String)
 ], ExerciseMethod.prototype, "observations", void 0);
 __decorate([
+    (0, typeorm_1.Column)({ type: 'int', nullable: true }),
+    __metadata("design:type", Number)
+], ExerciseMethod.prototype, "order", void 0);
+__decorate([
     (0, typeorm_1.Column)({ name: 'exercise_group_id', type: 'int' }),
     __metadata("design:type", Number)
 ], ExerciseMethod.prototype, "exerciseGroupId", void 0);

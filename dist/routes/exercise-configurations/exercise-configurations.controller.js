@@ -22,17 +22,7 @@ let ExerciseConfigurationsController = class ExerciseConfigurationsController ex
         this.exerciseConfigurationsService = exerciseConfigurationsService;
     }
     async updateListOfExerciseGroups(body) {
-        const exMethodId = body[0].exerciseMethodId;
-        const alreadyCreated = await this.exerciseConfigurationsService.getExerciseConfigurationsByExerciseMethodId(exMethodId);
-        const newOnes = body.filter((ec) => !ec.id || !alreadyCreated.includes(ec));
-        const deletedOnes = alreadyCreated.filter((ec) => !body
-            .filter((b) => b.id)
-            .map((b) => b.id)
-            .includes(ec.id));
-        const n = await this.createMany(newOnes);
-        const d$ = deletedOnes.map((ec) => this.exerciseConfigurationsService.remove(ec.id));
-        const d = await Promise.all(d$);
-        return { new: n, deleted: d };
+        return this.exerciseConfigurationsService.updateListOfExerciseGroups(body);
     }
 };
 __decorate([

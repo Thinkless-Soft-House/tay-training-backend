@@ -5,6 +5,7 @@ import { Relation } from 'typeorm';
 export declare class ExerciseMethod extends CoreEntity {
     rest: string;
     observations: string;
+    order: number;
     exerciseGroupId: number;
     exerciseGroup: Relation<ExerciseGroup>;
     exerciseConfigurations: Relation<ExerciseConfiguration[]>;

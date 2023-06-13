@@ -18,6 +18,23 @@ __decorate([
     (0, typeorm_1.Column)({ name: 'name', type: 'varchar', length: 255 }),
     __metadata("design:type", String)
 ], User.prototype, "name", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'email', type: 'varchar', length: 255 }),
+    __metadata("design:type", String)
+], User.prototype, "email", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'password', type: 'text' }),
+    __metadata("design:type", String)
+], User.prototype, "password", void 0);
+__decorate([
+    (0, typeorm_1.Column)({
+        name: 'codeToRecovery',
+        type: 'varchar',
+        length: 255,
+        nullable: true,
+    }),
+    __metadata("design:type", String)
+], User.prototype, "codeToRecovery", void 0);
 User = __decorate([
     (0, typeorm_1.Entity)('users')
 ], User);

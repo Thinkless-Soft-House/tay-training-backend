@@ -21,6 +21,7 @@ const training_sheet_module_1 = require("./routes/training-sheet/training-sheet.
 const training_day_module_1 = require("./routes/training-day/training-day.module");
 const exercise_group_categories_module_1 = require("./routes/exercise-group-categories/exercise-group-categories.module");
 const users_module_1 = require("./routes/users/users.module");
+const auth_module_1 = require("./core/services/auth/auth.module");
 const ormconfig_1 = require("./core/database/ormconfig");
 let AppModule = class AppModule {
 };
@@ -59,6 +60,7 @@ AppModule = __decorate([
             training_day_module_1.TrainingDayModule,
             exercise_group_categories_module_1.ExerciseGroupCategoriesModule,
             users_module_1.UsersModule,
+            auth_module_1.AuthModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
