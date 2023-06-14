@@ -7,4 +7,5 @@ export declare class UsersController extends CoreController<User, UsersService, 
     private readonly UserService;
     constructor(UserService: UsersService);
     create(createDto: CreateUserDto): Promise<User>;
+    createHash(password: string): Promise<string>;
 }

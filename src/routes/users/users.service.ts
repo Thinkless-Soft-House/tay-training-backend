@@ -17,6 +17,7 @@ export class UsersService extends CoreService<User> {
   override createWhere(query: any) {
     const where = {};
     if (query.name) where['name'] = ILike(`%${query.name}%`);
+    if (query.email) where['email'] = ILike(`%${query.email}%`);
 
     return where;
   }

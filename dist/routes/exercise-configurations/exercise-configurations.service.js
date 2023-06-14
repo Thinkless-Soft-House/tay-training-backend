@@ -69,7 +69,7 @@ let ExerciseConfigurationsService = class ExerciseConfigurationsService extends 
                 u = await this.updateManyQueryRunner(queryRunner, updatedOnes);
             }
             console.log('updatedOnes', updatedOnes);
-            await new Promise((resolve) => setTimeout(resolve, 500));
+            await new Promise((resolve) => setTimeout(resolve, 100));
             await queryRunner.commitTransaction();
             return { new: n, deleted: d, updated: u };
         }
@@ -84,7 +84,12 @@ let ExerciseConfigurationsService = class ExerciseConfigurationsService extends 
     async createManyQueryRunner(queryRunner, items) {
         try {
             const entities = items.map((item) => this.repository.create(item));
-            const createdItems = await queryRunner.manager.save(entities);
+            const createdItems = [];
+            for (const entity of entities) {
+                await queryRunner.manager.save(entity);
+                await new Promise((resolve) => setTimeout(resolve, 100));
+                createdItems.push(entity);
+            }
             return createdItems.length;
         }
         catch (error) {
@@ -95,8 +100,13 @@ let ExerciseConfigurationsService = class ExerciseConfigurationsService extends 
     async deleteManyQueryRunner(queryRunner, items) {
         try {
             const deletedIds = items.map((item) => item.id);
-            const deleteResult = await queryRunner.manager.delete(this.repository.target, deletedIds);
-            return deleteResult.affected;
+            const deleteResult = [];
+            for (const entity of deletedIds) {
+                await queryRunner.manager.delete(this.repository.target, entity);
+                await new Promise((resolve) => setTimeout(resolve, 100));
+                deleteResult.push(entity);
+            }
+            return deleteResult.length;
         }
         catch (error) {
             console.log(error);

@@ -6,7 +6,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { CoreController } from 'src/core/utils/core-controller.controller';
 import { ErrorHandler } from 'src/core/handlers/error.handler';
 
-import { hashSync } from 'bcryptjs';
+import * as bcrypt from 'bcrypt';
 
 @Controller('users')
 export class UsersController extends CoreController<
@@ -22,7 +22,7 @@ export class UsersController extends CoreController<
   @Post()
   async create(@Body() createDto: CreateUserDto) {
     try {
-      const encryptedPassword = hashSync(createDto.password, 10);
+      const encryptedPassword = await this.createHash(createDto.password);
 
       // Criar um novo objeto de usuário com a senha criptografada
       const newUser = {
@@ -39,5 +39,14 @@ export class UsersController extends CoreController<
         error.response?.statusCode || 400,
       );
     }
+  }
+
+  async createHash(password: string): Promise<string> {
+    const saltRounds = 10;
+    const salt = bcrypt.genSaltSync(saltRounds);
+    const passwordHash = bcrypt.hashSync(password, salt);
+
+    console.log('hash', passwordHash);
+    return passwordHash;
   }
 }

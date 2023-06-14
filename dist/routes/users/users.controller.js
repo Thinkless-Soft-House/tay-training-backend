@@ -18,7 +18,7 @@ const users_service_1 = require("./users.service");
 const create_user_dto_1 = require("./dto/create-user.dto");
 const core_controller_controller_1 = require("../../core/utils/core-controller.controller");
 const error_handler_1 = require("../../core/handlers/error.handler");
-const bcryptjs_1 = require("bcryptjs");
+const bcrypt = require("bcrypt");
 let UsersController = class UsersController extends core_controller_controller_1.CoreController {
     constructor(UserService) {
         super(UserService);
@@ -27,7 +27,7 @@ let UsersController = class UsersController extends core_controller_controller_1
     async create(createDto) {
         var _a, _b;
         try {
-            const encryptedPassword = (0, bcryptjs_1.hashSync)(createDto.password, 10);
+            const encryptedPassword = await this.createHash(createDto.password);
             const newUser = Object.assign(Object.assign({}, createDto), { password: encryptedPassword });
             const create$ = await this.service.create(newUser);
             return create$;
@@ -35,6 +35,13 @@ let UsersController = class UsersController extends core_controller_controller_1
         catch (error) {
             throw new error_handler_1.ErrorHandler(error.message, ((_a = error.response) === null || _a === void 0 ? void 0 : _a.errorCode) || 400, ((_b = error.response) === null || _b === void 0 ? void 0 : _b.statusCode) || 400);
         }
+    }
+    async createHash(password) {
+        const saltRounds = 10;
+        const salt = bcrypt.genSaltSync(saltRounds);
+        const passwordHash = bcrypt.hashSync(password, salt);
+        console.log('hash', passwordHash);
+        return passwordHash;
     }
 };
 __decorate([

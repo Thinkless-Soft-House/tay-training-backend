@@ -24,7 +24,7 @@ __decorate([
     __metadata("design:type", String)
 ], Exercise.prototype, "description", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'video_url', type: 'varchar', length: 255 }),
+    (0, typeorm_1.Column)({ name: 'video_url', type: 'varchar', length: 255, nullable: true }),
     __metadata("design:type", String)
 ], Exercise.prototype, "videoUrl", void 0);
 __decorate([

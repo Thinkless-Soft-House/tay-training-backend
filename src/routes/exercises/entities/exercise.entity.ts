@@ -10,7 +10,7 @@ export class Exercise extends CoreEntity {
   @Column({ name: 'description', type: 'text', nullable: true })
   description: string;
 
-  @Column({ name: 'video_url', type: 'varchar', length: 255 })
+  @Column({ name: 'video_url', type: 'varchar', length: 255, nullable: true })
   videoUrl: string;
 
   @Column({ name: 'has_method', type: 'boolean', default: true })

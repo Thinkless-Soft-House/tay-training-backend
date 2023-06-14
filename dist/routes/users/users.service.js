@@ -26,6 +26,8 @@ let UsersService = class UsersService extends core_service_service_1.CoreService
         const where = {};
         if (query.name)
             where['name'] = (0, typeorm_2.ILike)(`%${query.name}%`);
+        if (query.email)
+            where['email'] = (0, typeorm_2.ILike)(`%${query.email}%`);
         return where;
     }
 };

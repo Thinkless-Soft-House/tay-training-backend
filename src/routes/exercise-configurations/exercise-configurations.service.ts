@@ -71,7 +71,7 @@ export class ExerciseConfigurationsService extends CoreService<ExerciseConfigura
       }
       console.log('updatedOnes', updatedOnes);
 
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       await queryRunner.commitTransaction();
 
@@ -87,7 +87,14 @@ export class ExerciseConfigurationsService extends CoreService<ExerciseConfigura
   async createManyQueryRunner(queryRunner: QueryRunner, items: any[]) {
     try {
       const entities = items.map((item) => this.repository.create(item));
-      const createdItems = await queryRunner.manager.save(entities);
+
+      const createdItems = [];
+      for (const entity of entities) {
+        await queryRunner.manager.save(entity); // Salvar uma entidade por vez usando o QueryRunner fornecido
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        createdItems.push(entity);
+      }
+
       return createdItems.length;
     } catch (error) {
       console.log(error);
@@ -98,11 +105,15 @@ export class ExerciseConfigurationsService extends CoreService<ExerciseConfigura
   async deleteManyQueryRunner(queryRunner: QueryRunner, items: any[]) {
     try {
       const deletedIds = items.map((item) => item.id);
-      const deleteResult = await queryRunner.manager.delete(
-        this.repository.target,
-        deletedIds,
-      );
-      return deleteResult.affected;
+
+      const deleteResult = [];
+      for (const entity of deletedIds) {
+        await queryRunner.manager.delete(this.repository.target, entity);
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        deleteResult.push(entity);
+      }
+
+      return deleteResult.length;
     } catch (error) {
       console.log(error);
       throw translateTypeORMError(error);
