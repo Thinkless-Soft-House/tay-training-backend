@@ -41,7 +41,6 @@ export class CoreService<T> {
       // });
 
       // const res = await Promise.all(items);
-      console.log(res);
       return res;
     } catch (error) {
       console.log(error);
@@ -50,9 +49,7 @@ export class CoreService<T> {
   }
 
   async findByFilter(query: any) {
-    console.log(query);
     const where = this.createWhere(query);
-    console.log(where);
     try {
       const results = await this.repository.findAndCount({
         where,
@@ -113,10 +110,8 @@ export class CoreService<T> {
       }
 
       // Create a new item
-      console.log(updateDto);
       const dto = { id, ...updateDto };
       const newItem: any = this.repository.create(dto);
-      console.log(newItem);
       // Save item in database
       await this.repository.update(id, newItem);
 
@@ -129,7 +124,6 @@ export class CoreService<T> {
 
   async updateMany(items: { id: number; data: any }[]) {
     try {
-      console.log('updateMany', items);
       items.map(async (item) => {
         return this.update(item.id, item.data);
       });

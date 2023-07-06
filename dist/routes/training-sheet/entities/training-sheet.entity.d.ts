@@ -7,5 +7,6 @@ export declare class TrainingSheet extends CoreEntity {
     slug: string;
     offlinePdf: string;
     newTabPdf: string;
+    pdfPath: string;
     trainingDays: Relation<TrainingDay[]>;
 }

@@ -30,7 +30,6 @@ class CoreService {
                 console.log('Criado!');
                 res.push(r);
             }
-            console.log(res);
             return res;
         }
         catch (error) {
@@ -39,9 +38,7 @@ class CoreService {
         }
     }
     async findByFilter(query) {
-        console.log(query);
         const where = this.createWhere(query);
-        console.log(where);
         try {
             const results = await this.repository.findAndCount({
                 where,
@@ -95,10 +92,8 @@ class CoreService {
             if (!item) {
                 throw new error_handler_1.ErrorHandler('Item não encontrado', 404, 404);
             }
-            console.log(updateDto);
             const dto = Object.assign({ id }, updateDto);
             const newItem = this.repository.create(dto);
-            console.log(newItem);
             await this.repository.update(id, newItem);
             return await this.repository.findOne({ where: whereId });
         }
@@ -108,7 +103,6 @@ class CoreService {
     }
     async updateMany(items) {
         try {
-            console.log('updateMany', items);
             items.map(async (item) => {
                 return this.update(item.id, item.data);
             });

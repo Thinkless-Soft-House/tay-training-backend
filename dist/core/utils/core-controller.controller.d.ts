@@ -18,7 +18,7 @@ export declare class CoreController<Entity extends HasId, Service extends IsServ
     service: Service;
     constructor(service: Service);
     create(createDto: CreateDTO): Promise<Entity>;
-    createMany(createDto: CreateDTO[]): Promise<Entity>;
+    createMany(createDto: CreateDTO[]): Promise<Entity[]>;
     findAll(query: any): Promise<Entity[]>;
     findByFilter(query: any): Promise<any>;
     findOne(id: string, query: any): Promise<Entity>;

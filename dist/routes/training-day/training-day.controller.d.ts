@@ -7,7 +7,7 @@ export declare class TrainingDayController extends CoreController<TrainingDay, T
     private readonly trainingDayService;
     constructor(trainingDayService: TrainingDayService);
     updateListOfExerciseGroups(body: TrainingDay[]): Promise<{
-        new: TrainingDay;
+        new: TrainingDay[];
         deleted: TrainingDay[];
     }>;
 }

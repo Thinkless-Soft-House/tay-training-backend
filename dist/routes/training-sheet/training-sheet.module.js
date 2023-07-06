@@ -12,13 +12,14 @@ const training_sheet_service_1 = require("./training-sheet.service");
 const training_sheet_controller_1 = require("./training-sheet.controller");
 const typeorm_1 = require("@nestjs/typeorm");
 const training_sheet_entity_1 = require("./entities/training-sheet.entity");
+const File_service_1 = require("../../core/services/File.service");
 let TrainingSheetModule = class TrainingSheetModule {
 };
 TrainingSheetModule = __decorate([
     (0, common_1.Module)({
         imports: [typeorm_1.TypeOrmModule.forFeature([training_sheet_entity_1.TrainingSheet])],
         controllers: [training_sheet_controller_1.TrainingSheetController],
-        providers: [training_sheet_service_1.TrainingSheetService],
+        providers: [training_sheet_service_1.TrainingSheetService, File_service_1.FileService],
     })
 ], TrainingSheetModule);
 exports.TrainingSheetModule = TrainingSheetModule;

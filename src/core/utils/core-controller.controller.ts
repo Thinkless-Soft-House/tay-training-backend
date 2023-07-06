@@ -26,7 +26,7 @@ export class CoreController<
   constructor(public service: Service) {}
 
   @Post()
-  async create(@Body() createDto: CreateDTO) {
+  async create(@Body() createDto: CreateDTO): Promise<Entity> {
     try {
       const create$: Entity = await this.service.create(createDto);
       return create$;
@@ -39,9 +39,9 @@ export class CoreController<
     }
   }
   @Post('/many')
-  async createMany(@Body() createDto: CreateDTO[]) {
+  async createMany(@Body() createDto: CreateDTO[]): Promise<Entity[]> {
     try {
-      const create$: Entity = await this.service.createMany(createDto);
+      const create$: Entity[] = await this.service.createMany(createDto);
       return create$;
     } catch (error) {
       throw new ErrorHandler(
