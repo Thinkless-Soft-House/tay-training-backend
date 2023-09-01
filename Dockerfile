@@ -11,4 +11,4 @@ RUN npm install --production
 # Copie os outros arquivos para a imagem
 COPY /dist/ ./dist/
 
-CMD [ "node", "dist/main.js" ]
+CMD [ "node", "dist/src/main.js" ]
