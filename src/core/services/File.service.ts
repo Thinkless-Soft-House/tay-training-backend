@@ -5,7 +5,9 @@ import * as path from 'path';
 @Injectable()
 export class FileService {
   async createFile(path: string, name: string, file: any) {
-    console.log('FileService.createFile() => Criando um novo arquivo');
+    console.log(
+      'FileService.createFile() => Criando/Atualizando um novo arquivo',
+    );
 
     // Checar se no caminho existe um arquivo com o mesmo nome
     fs.mkdirSync(path, { recursive: true });

@@ -76,11 +76,20 @@ export class TrainingSheetController extends CoreController<
     },
   ) {
     try {
-      const update$: TrainingSheet = await this.service.updateWithFile(
-        +id,
-        updateDto,
-        file.file[0].buffer,
+      console.log(
+        'TrainingSheetController.updateWithFile() => Atualizando um treino com arquivo',
       );
+
+      let update$;
+      if (file && file.file) {
+        update$ = await this.service.updateWithFile(
+          +id,
+          updateDto,
+          file.file[0].buffer,
+        );
+      } else {
+        update$ = await this.service.update(+id, updateDto);
+      }
       return update$;
     } catch (error) {
       throw new ErrorHandler(

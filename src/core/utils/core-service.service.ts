@@ -30,9 +30,7 @@ export class CoreService<T> {
     try {
       const res = [];
       for (const item of items) {
-        console.log('Criando...');
         const r = await this.create(item);
-        console.log('Criado!');
         res.push(r);
       }
 
@@ -100,6 +98,8 @@ export class CoreService<T> {
   async update(id: number, updateDto: any) {
     try {
       // Check if item exists
+      console.log('updateDto', updateDto);
+
       const whereId: any = { id };
       const item = await this.repository.findOne({
         where: whereId,

@@ -15,6 +15,9 @@ export class TrainingDay extends CoreEntity {
   @Column({ name: 'exercise_group_id' })
   exerciseGroupId: number;
 
+  @Column({ name: 'short_name', nullable: true })
+  shortName: string;
+
   // Relations
 
   @ManyToOne(
