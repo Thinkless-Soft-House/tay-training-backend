@@ -51,10 +51,21 @@ export class TrainingSheetController extends CoreController<
       // );
 
       // return { ok: true };
-      const create$: TrainingSheet = await this.service.createWithFile(
-        { ...createDto, trainingDays: JSON.parse(createDto.trainingDays) },
-        file.file[0].buffer,
-      );
+      let create$;
+      if (file && !!file.file) {
+        console.log('has file, file.file => ', file.file);
+        create$ = await this.service.createWithFile(
+          { ...createDto, trainingDays: JSON.parse(createDto.trainingDays) },
+          file.file[0].buffer,
+        );
+      } else {
+        console.log('has no file');
+        create$ = await this.service.create({
+          ...createDto,
+          trainingDays: JSON.parse(createDto.trainingDays),
+        });
+      }
+
       return create$;
     } catch (error) {
       throw new ErrorHandler(
@@ -81,13 +92,16 @@ export class TrainingSheetController extends CoreController<
       );
 
       let update$;
+
       if (file && file.file) {
+        console.log('has file');
         update$ = await this.service.updateWithFile(
           +id,
           updateDto,
           file.file[0].buffer,
         );
       } else {
+        console.log('has no file');
         update$ = await this.service.update(+id, updateDto);
       }
       return update$;

@@ -27,7 +27,15 @@ let TrainingSheetController = class TrainingSheetController extends core_control
         var _a, _b;
         try {
             console.log('TrainingSheetController.createWithFile() => Criando um novo treino com arquivo');
-            const create$ = await this.service.createWithFile(Object.assign(Object.assign({}, createDto), { trainingDays: JSON.parse(createDto.trainingDays) }), file.file[0].buffer);
+            let create$;
+            if (file && !!file.file) {
+                console.log('has file, file.file => ', file.file);
+                create$ = await this.service.createWithFile(Object.assign(Object.assign({}, createDto), { trainingDays: JSON.parse(createDto.trainingDays) }), file.file[0].buffer);
+            }
+            else {
+                console.log('has no file');
+                create$ = await this.service.create(Object.assign(Object.assign({}, createDto), { trainingDays: JSON.parse(createDto.trainingDays) }));
+            }
             return create$;
         }
         catch (error) {
@@ -40,9 +48,11 @@ let TrainingSheetController = class TrainingSheetController extends core_control
             console.log('TrainingSheetController.updateWithFile() => Atualizando um treino com arquivo');
             let update$;
             if (file && file.file) {
+                console.log('has file');
                 update$ = await this.service.updateWithFile(+id, updateDto, file.file[0].buffer);
             }
             else {
+                console.log('has no file');
                 update$ = await this.service.update(+id, updateDto);
             }
             return update$;

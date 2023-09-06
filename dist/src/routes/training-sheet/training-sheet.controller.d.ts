@@ -10,7 +10,7 @@ export declare class TrainingSheetController extends CoreController<TrainingShee
     constructor(trainingSheetService: TrainingSheetService);
     createWithFile(createDto: any, file: {
         file?: MulterFile[];
-    }): Promise<TrainingSheet>;
+    }): Promise<any>;
     updateWithFile(id: string, updateDto: any, file: {
         file?: MulterFile[];
     }): Promise<any>;
