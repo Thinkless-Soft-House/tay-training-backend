@@ -20,6 +20,11 @@ function createOrmConfig(connData: {
     database: connData.database || 'mydb',
     entities: [join(__dirname, '../../**/*.entity{.ts,.js}')],
     synchronize: connData.synchronize === 'true',
+    extra: {
+      ssl: {
+        rejectUnauthorized: false,
+      },
+    },
   };
 }
 
