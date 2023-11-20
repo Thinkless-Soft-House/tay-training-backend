@@ -41,6 +41,7 @@ AppModule = __decorate([
             typeorm_1.TypeOrmModule.forRootAsync({
                 imports: [config_1.ConfigModule],
                 useFactory: (configService) => {
+                    console.log('configService.get("POSTGRES_HOST")', configService.get('POSTGRES_HOST'));
                     const ormconfig = (0, ormconfig_1.default)({
                         host: configService.get('POSTGRES_HOST'),
                         port: configService.get('POSTGRES_PORT'),

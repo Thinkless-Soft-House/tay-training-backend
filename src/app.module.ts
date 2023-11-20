@@ -32,6 +32,10 @@ import createOrmconfig from './core/database/ormconfig';
       imports: [ConfigModule],
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       useFactory: (configService: ConfigService) => {
+        console.log(
+          'configService.get("POSTGRES_HOST")',
+          configService.get('POSTGRES_HOST'),
+        );
         const ormconfig = createOrmconfig({
           host: configService.get('POSTGRES_HOST'),
           port: configService.get('POSTGRES_PORT'),
