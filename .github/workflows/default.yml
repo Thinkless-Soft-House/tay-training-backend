@@ -7,25 +7,42 @@ on:
       - develop
 
 jobs:
-  build-and-push-image:
+  # build-and-push-image:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+
+  #     - name: Login to Docker Hub
+  #       uses: docker/login-action@v3
+  #       with:
+  #         username: ${{ secrets.DOCKERHUB_USERNAME }}
+  #         password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v3
+
+  #     - name: Build and push
+  #       uses: docker/build-push-action@v5
+  #       with:
+  #         context: .
+  #         file: Dockerfile
+  #         push: true
+  #         tags: ${{ secrets.DOCKERHUB_IMAGENAME }}:${{ github.ref == 'refs/heads/main' && 'latest' || 'stage' }}
+  deploy-on-gcp:
+    # needs: build-and-push-image # Certifique-se de que o deploy só acontece após o build
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
+      - uses: 'actions/checkout@v4'
+  
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v1'
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build and push
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKERHUB_IMAGENAME }}:${{ github.ref == 'refs/heads/main' && 'latest' || 'stage' }}
+          create_credentials_file: true
+          workload_identity_provider: 'projects/447908479476/locations/global/workloadIdentityPools/github-actions/providers/github-workload'
+          service_account: 'caio-domingos@thinkless.iam.gserviceaccount.com	'
