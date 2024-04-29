@@ -41,9 +41,8 @@ jobs:
   
       - id: 'auth'
         name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@v1'
+        uses: 'google-github-actions/auth@v2'
         with:
-          create_credentials_file: true
           workload_identity_provider: 'projects/447908479476/locations/global/workloadIdentityPools/github-actions/providers/github-workload'
           service_account: 'caio-domingos@thinkless.iam.gserviceaccount.com	'
       - id: 'compute-ssh'
