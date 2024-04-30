@@ -68,6 +68,7 @@ jobs:
             --name ${{ secrets.CONTAINER_NAME }} \
             -p 3000:3000 \
             -v $(pwd)/app-data:/usr/src/app \
+            -v ./files_data:/app/files \
             -e POSTGRES_HOST=${{ secrets.POSTGRES_HOST }} \
             -e POSTGRES_PORT=${{ secrets.POSTGRES_PORT }} \
             -e POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
