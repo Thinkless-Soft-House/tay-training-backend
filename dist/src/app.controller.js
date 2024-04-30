@@ -17,12 +17,15 @@ let AppController = class AppController {
         this.appService = appService;
     }
     getHello() {
+        console.log('getHello');
         return this.appService.getHello();
     }
     getHello2() {
+        console.log('getHello2');
         return this.appService.getHello2();
     }
     getHello3() {
+        console.log('getHello3');
         return this.appService.getHello3();
     }
 };
