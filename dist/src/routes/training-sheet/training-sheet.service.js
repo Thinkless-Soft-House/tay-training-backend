@@ -154,7 +154,7 @@ let TrainingSheetService = class TrainingSheetService extends core_service_servi
             .where('workout.slug = :slug', { slug });
         const planner = await query.getOne();
         const weekDays = [];
-        for (let i = startDay + 1; i <= endDay; i++) {
+        for (let i = startDay; i <= endDay; i++) {
             const day = planner === null || planner === void 0 ? void 0 : planner.trainingDays.find((td) => td.day === i);
             if (day) {
                 weekDays.push({
@@ -169,6 +169,7 @@ let TrainingSheetService = class TrainingSheetService extends core_service_servi
                 weekDays.push(null);
             }
         }
+        weekDays.splice(0, 1);
         return {
             id: planner === null || planner === void 0 ? void 0 : planner.id,
             publicName: planner === null || planner === void 0 ? void 0 : planner.publicName,
@@ -179,7 +180,7 @@ let TrainingSheetService = class TrainingSheetService extends core_service_servi
     async getWorkoutDetail(slug, week, workoutIndex) {
         const startDay = week * 7 - 6;
         const endDay = week * 7;
-        const dayNumber = startDay + workoutIndex;
+        const dayNumber = startDay + workoutIndex + 1;
         const query = this.repository
             .createQueryBuilder('trainingSheet')
             .leftJoinAndSelect('trainingSheet.trainingDays', 'trainingDay', 'trainingDay.day = :dayNumber', { dayNumber })

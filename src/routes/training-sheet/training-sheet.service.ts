@@ -238,7 +238,7 @@ export class TrainingSheetService extends CoreService<TrainingSheet> {
 
     // Garantir que todos os dias da semana estejam presentes, preenchendo com null quando necessário
     const weekDays = [];
-    for (let i = startDay + 1; i <= endDay; i++) {
+    for (let i = startDay; i <= endDay; i++) {
       const day = planner?.trainingDays.find((td) => td.day === i);
       if (day) {
         weekDays.push({
@@ -253,6 +253,9 @@ export class TrainingSheetService extends CoreService<TrainingSheet> {
       }
     }
 
+    // Remover o primeiro elemento da lista
+    weekDays.splice(0, 1);
+
     return {
       id: planner?.id,
       publicName: planner?.publicName,
@@ -264,7 +267,7 @@ export class TrainingSheetService extends CoreService<TrainingSheet> {
   async getWorkoutDetail(slug: string, week: number, workoutIndex: number) {
     const startDay = week * 7 - 6;
     const endDay = week * 7;
-    const dayNumber = startDay + workoutIndex;
+    const dayNumber = startDay + workoutIndex + 1;
 
     const query = this.repository
       .createQueryBuilder('trainingSheet')
