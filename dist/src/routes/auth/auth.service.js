@@ -35,25 +35,41 @@ let AuthService = class AuthService {
             email: username,
         });
         const user = userSearch.data[0];
-        console.log('user founded', user);
         if (!user) {
-            return null;
+            return { error: 'Usuário não encontrado' };
         }
-        if (bcrypt.compare(user.password, pass)) {
-            console.log('password match');
+        const isMatch = await bcrypt.compare(pass, user.password);
+        if (isMatch) {
             const { password } = user, result = __rest(user, ["password"]);
             return result;
         }
         else {
-            console.log('password not match');
+            return { error: 'Senha incorreta' };
         }
-        return null;
     }
     async login(user) {
         const payload = { email: user.email, sub: user.id };
         return {
             access_token: this.jwtService.sign(payload),
+            id: user.id,
         };
+    }
+    async register(userDto) {
+        const user = await this.usersService.findByFilter({ email: userDto.email });
+        if (user.data.length > 0) {
+            throw new common_1.BadRequestException('User already exists');
+        }
+        const saltRounds = 10;
+        const salt = bcrypt.genSaltSync(saltRounds);
+        const passwordHash = bcrypt.hashSync(userDto.password, salt);
+        const newUser = await this.usersService.create(Object.assign(Object.assign({}, userDto), { password: passwordHash }));
+        return newUser;
+    }
+    hashPassword(password) {
+        const saltRounds = 10;
+        const salt = bcrypt.genSaltSync(saltRounds);
+        const passwordHash = bcrypt.hashSync(password, salt);
+        return passwordHash;
     }
 };
 AuthService = __decorate([

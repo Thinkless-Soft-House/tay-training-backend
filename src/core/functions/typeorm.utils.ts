@@ -3,7 +3,7 @@ import { TypeORMError } from 'typeorm';
 export function translateErrorMessage(message: string): string {
   // Adicione suas próprias regras de tradução aqui
   // Por exemplo:
-  console.log('message', message);
+
   if (message.includes('duplicate key value')) {
     return 'Valor duplicado. A operação viola a restrição de chave única.';
   }

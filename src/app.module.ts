@@ -14,6 +14,8 @@ import { ExerciseGroupCategoriesModule } from './routes/exercise-group-categorie
 import { UsersModule } from './routes/users/users.module';
 import { AuthModule } from './routes/auth/auth.module';
 import createOrmconfig from './core/database/ormconfig';
+import { JwtAuthGuard } from './routes/auth/jwt-auth.guard';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -32,10 +34,10 @@ import createOrmconfig from './core/database/ormconfig';
       imports: [ConfigModule],
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       useFactory: (configService: ConfigService) => {
-        console.log(
-          'configService.get("POSTGRES_HOST")',
-          configService.get('POSTGRES_HOST'),
-        );
+        // console.log(
+        //   'configService.get("POSTGRES_HOST")',
+        //   configService.get('POSTGRES_HOST'),
+        // );
         const ormconfig = createOrmconfig({
           host: configService.get('POSTGRES_HOST'),
           port: configService.get('POSTGRES_PORT'),
@@ -48,6 +50,11 @@ import createOrmconfig from './core/database/ormconfig';
       },
       inject: [ConfigService],
     }),
+    CacheModule.register({
+      isGlobal: true,
+      ttl: 1200 * 60 * 1000, // 20 minutos apartir de milissegundos
+      max: 100, // Máximo de 100 itens no cache
+    }),
     ExerciseGroupsModule,
     ExerciseMethodModule,
     ExerciseConfigurationsModule,
@@ -58,6 +65,12 @@ import createOrmconfig from './core/database/ormconfig';
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: 'APP_GUARD',
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {}
