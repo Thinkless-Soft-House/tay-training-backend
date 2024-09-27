@@ -154,9 +154,20 @@ let TrainingSheetService = class TrainingSheetService extends core_service_servi
             .where('workout.slug = :slug', { slug });
         const planner = await query.getOne();
         const weekDays = [];
-        for (let day = startDay; day <= endDay; day++) {
-            const trainingDay = (planner === null || planner === void 0 ? void 0 : planner.trainingDays.find((td) => td.day === day)) || null;
-            weekDays.push(trainingDay);
+        for (let i = startDay + 1; i <= endDay; i++) {
+            const day = planner === null || planner === void 0 ? void 0 : planner.trainingDays.find((td) => td.day === i);
+            if (day) {
+                weekDays.push({
+                    day: day.day,
+                    shortName: day.shortName,
+                    exerciseGroup: day.exerciseGroup
+                        ? { publicName: day.exerciseGroup.publicName }
+                        : null,
+                });
+            }
+            else {
+                weekDays.push(null);
+            }
         }
         return {
             id: planner === null || planner === void 0 ? void 0 : planner.id,

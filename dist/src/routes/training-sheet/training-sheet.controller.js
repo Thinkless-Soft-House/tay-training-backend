@@ -106,6 +106,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], TrainingSheetController.prototype, "updateWithFile", null);
 __decorate([
+    (0, jwt_auth_guard_1.Public)(),
     (0, common_1.Get)('file/:id'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Res)()),

@@ -119,6 +119,7 @@ export class TrainingSheetController extends CoreController<
     }
   }
 
+  @Public()
   @Get('file/:id')
   async getFile(@Param('id') id: string, @Res() res: Response) {
     try {

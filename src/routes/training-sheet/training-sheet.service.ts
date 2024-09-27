@@ -238,10 +238,19 @@ export class TrainingSheetService extends CoreService<TrainingSheet> {
 
     // Garantir que todos os dias da semana estejam presentes, preenchendo com null quando necessário
     const weekDays = [];
-    for (let day = startDay; day <= endDay; day++) {
-      const trainingDay =
-        planner?.trainingDays.find((td) => td.day === day) || null;
-      weekDays.push(trainingDay);
+    for (let i = startDay + 1; i <= endDay; i++) {
+      const day = planner?.trainingDays.find((td) => td.day === i);
+      if (day) {
+        weekDays.push({
+          day: day.day,
+          shortName: day.shortName,
+          exerciseGroup: day.exerciseGroup
+            ? { publicName: day.exerciseGroup.publicName }
+            : null,
+        });
+      } else {
+        weekDays.push(null);
+      }
     }
 
     return {
