@@ -14,6 +14,9 @@ import { ExerciseGroupCategoriesModule } from './routes/exercise-group-categorie
 import { UsersModule } from './routes/users/users.module';
 import { AuthModule } from './routes/auth/auth.module';
 import createOrmconfig from './core/database/ormconfig';
+import { JwtAuthGuard } from './routes/auth/jwt-auth.guard';
+import { CacheModule } from '@nestjs/cache-manager';
+import { MenuCalculatorModule } from './routes/menu-calculator/menu-calculator.module';
 
 @Module({
   imports: [
@@ -48,6 +51,12 @@ import createOrmconfig from './core/database/ormconfig';
       },
       inject: [ConfigService],
     }),
+    CacheModule.register({
+      isGlobal: true,
+      ttl: 1200 * 60 * 1000, // 20 minutos apartir de milissegundos
+      max: 100, // Máximo de 100 itens no cache
+    }),
+    MenuCalculatorModule,
     ExerciseGroupsModule,
     ExerciseMethodModule,
     ExerciseConfigurationsModule,

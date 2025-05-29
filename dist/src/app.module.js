@@ -23,6 +23,8 @@ const exercise_group_categories_module_1 = require("./routes/exercise-group-cate
 const users_module_1 = require("./routes/users/users.module");
 const auth_module_1 = require("./routes/auth/auth.module");
 const ormconfig_1 = require("./core/database/ormconfig");
+const cache_manager_1 = require("@nestjs/cache-manager");
+const menu_calculator_module_1 = require("./routes/menu-calculator/menu-calculator.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -54,6 +56,12 @@ AppModule = __decorate([
                 },
                 inject: [config_1.ConfigService],
             }),
+            cache_manager_1.CacheModule.register({
+                isGlobal: true,
+                ttl: 1200 * 60 * 1000,
+                max: 100,
+            }),
+            menu_calculator_module_1.MenuCalculatorModule,
             exercise_groups_module_1.ExerciseGroupsModule,
             exercise_method_module_1.ExerciseMethodModule,
             exercise_configurations_module_1.ExerciseConfigurationsModule,
