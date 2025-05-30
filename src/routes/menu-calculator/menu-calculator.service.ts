@@ -15,20 +15,55 @@ export class MenuCalculatorService extends CoreService<Menu> {
 
   override createWhere(query: any) {
     let where = {};
-    if (query.name) where['name'] = ILike(`%${query.name}%`);
 
-    if (query.description)
-      where['description'] = ILike(`%${query.description}%`);
-
-    if (query.status) where['status'] = query.status;
-
-    if (query.filter) {
-      const aux = where;
-      where = [
-        { ...aux, name: ILike(`%${query.filter}%`) },
-        { ...aux, description: ILike(`%${query.filter}%`) },
-      ];
+    // Garante que filters seja um array, mesmo se vier como string JSON
+    let filters = query.filters;
+    if (typeof filters === 'string') {
+      try {
+        filters = JSON.parse(filters);
+      } catch {
+        filters = [];
+      }
     }
+
+    // Se houver múltiplos filtros, monta um array de where (OR entre filtros)
+    if (Array.isArray(filters) && filters.length > 0) {
+      where = filters.map((filter: any) => {
+        // Corrige: para campos numéricos, nunca use ILIKE
+        const isNumericField = ['minCalories', 'maxCalories'].includes(filter.field);
+        if (filter.operator === 'like' && isNumericField) {
+          // Tenta extrair o número do valor (ex: '%2%' -> 2)
+          const num = parseInt((filter.value || '').replace(/[^0-9]/g, ''));
+          if (!isNaN(num)) {
+            return { [filter.field]: num };
+          }
+          return {}; // ignora filtro inválido
+        } else if (filter.operator === 'like') {
+          return { [filter.field]: ILike(filter.value) };
+        } else if (filter.operator === '=' && isNumericField) {
+          return { [filter.field]: Number(filter.value) };
+        } else if (filter.operator === '=') {
+          return { [filter.field]: filter.value };
+        }
+        return {};
+      });
+    } else {
+      // Fallback para filtros antigos
+      if (query.name) where['name'] = ILike(`%${query.name}%`);
+      if (query.description) where['description'] = ILike(`%${query.description}%`);
+      if (query.status) where['status'] = query.status;
+      if (query.filter) {
+        const aux = where;
+        where = [
+          { ...aux, name: ILike(`%${query.filter}%`) },
+          { ...aux, description: ILike(`%${query.filter}%`) },
+        ];
+      }
+    }
+
+    // LOG para debug
+    console.log('[MenuCalculatorService] createWhere - query:', JSON.stringify(query));
+    console.log('[MenuCalculatorService] createWhere - where:', JSON.stringify(where));
 
     return where;
   }

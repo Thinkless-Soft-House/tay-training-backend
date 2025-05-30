@@ -38,13 +38,15 @@ class CoreService {
     async findByFilter(query) {
         const where = this.createWhere(query);
         try {
+            const orderField = query.orderField || query.orderColumn || 'id';
+            const orderDirection = (query.orderDirection || query.order || 'ASC').toUpperCase();
             const results = await this.repository.findAndCount({
                 where,
                 relations: query.relations ? query.relations.split(',') : [],
                 take: query.take,
                 skip: query.skip,
                 order: {
-                    [query.orderColumn || 'id']: query.order || 'ASC',
+                    [orderField]: orderDirection,
                 },
             });
             return {

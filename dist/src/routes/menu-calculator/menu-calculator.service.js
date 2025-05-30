@@ -25,19 +25,54 @@ let MenuCalculatorService = class MenuCalculatorService extends core_service_ser
     }
     createWhere(query) {
         let where = {};
-        if (query.name)
-            where['name'] = (0, typeorm_1.ILike)(`%${query.name}%`);
-        if (query.description)
-            where['description'] = (0, typeorm_1.ILike)(`%${query.description}%`);
-        if (query.status)
-            where['status'] = query.status;
-        if (query.filter) {
-            const aux = where;
-            where = [
-                Object.assign(Object.assign({}, aux), { name: (0, typeorm_1.ILike)(`%${query.filter}%`) }),
-                Object.assign(Object.assign({}, aux), { description: (0, typeorm_1.ILike)(`%${query.filter}%`) }),
-            ];
+        let filters = query.filters;
+        if (typeof filters === 'string') {
+            try {
+                filters = JSON.parse(filters);
+            }
+            catch (_a) {
+                filters = [];
+            }
         }
+        if (Array.isArray(filters) && filters.length > 0) {
+            where = filters.map((filter) => {
+                const isNumericField = ['minCalories', 'maxCalories'].includes(filter.field);
+                if (filter.operator === 'like' && isNumericField) {
+                    const num = parseInt((filter.value || '').replace(/[^0-9]/g, ''));
+                    if (!isNaN(num)) {
+                        return { [filter.field]: num };
+                    }
+                    return {};
+                }
+                else if (filter.operator === 'like') {
+                    return { [filter.field]: (0, typeorm_1.ILike)(filter.value) };
+                }
+                else if (filter.operator === '=' && isNumericField) {
+                    return { [filter.field]: Number(filter.value) };
+                }
+                else if (filter.operator === '=') {
+                    return { [filter.field]: filter.value };
+                }
+                return {};
+            });
+        }
+        else {
+            if (query.name)
+                where['name'] = (0, typeorm_1.ILike)(`%${query.name}%`);
+            if (query.description)
+                where['description'] = (0, typeorm_1.ILike)(`%${query.description}%`);
+            if (query.status)
+                where['status'] = query.status;
+            if (query.filter) {
+                const aux = where;
+                where = [
+                    Object.assign(Object.assign({}, aux), { name: (0, typeorm_1.ILike)(`%${query.filter}%`) }),
+                    Object.assign(Object.assign({}, aux), { description: (0, typeorm_1.ILike)(`%${query.filter}%`) }),
+                ];
+            }
+        }
+        console.log('[MenuCalculatorService] createWhere - query:', JSON.stringify(query));
+        console.log('[MenuCalculatorService] createWhere - where:', JSON.stringify(where));
         return where;
     }
     async findByCalories(calories) {

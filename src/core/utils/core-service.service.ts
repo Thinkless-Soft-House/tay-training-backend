@@ -49,13 +49,16 @@ export class CoreService<T> {
   async findByFilter(query: any) {
     const where = this.createWhere(query);
     try {
+      // Aceita tanto orderField/orderDirection quanto orderColumn/order
+      const orderField = query.orderField || query.orderColumn || 'id';
+      const orderDirection = (query.orderDirection || query.order || 'ASC').toUpperCase();
       const results = await this.repository.findAndCount({
         where,
         relations: query.relations ? query.relations.split(',') : [],
         take: query.take,
         skip: query.skip,
         order: {
-          [query.orderColumn || 'id']: query.order || 'ASC',
+          [orderField]: orderDirection,
         },
       });
 
