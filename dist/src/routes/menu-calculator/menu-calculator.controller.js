@@ -19,6 +19,7 @@ const create_menu_dto_1 = require("./dto/create-menu.dto");
 const update_menu_dto_1 = require("./dto/update-menu.dto");
 const core_controller_v2_controller_1 = require("../../core/utils/core-controller-v2.controller");
 const validation_pipe_1 = require("../../core/pipes/validation.pipe");
+const public_decorator_1 = require("../auth/public.decorator");
 let MenuCalculatorController = class MenuCalculatorController extends core_controller_v2_controller_1.CoreControllerV2 {
     constructor(menuCalculatorService) {
         super(menuCalculatorService, create_menu_dto_1.CreateMenuDto, update_menu_dto_1.UpdateMenuDto);
@@ -29,6 +30,7 @@ let MenuCalculatorController = class MenuCalculatorController extends core_contr
     }
 };
 __decorate([
+    (0, public_decorator_1.Public)(),
     (0, common_1.Get)('find-by-calories/:calories'),
     __param(0, (0, common_1.Param)('calories', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
