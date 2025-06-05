@@ -6,6 +6,7 @@ import { UpdateMenuDto } from './dto/update-menu.dto';
 import { Menu } from './entities/menu.entity';
 import { CoreControllerV2 } from 'src/core/utils/core-controller-v2.controller';
 import { ValidationPipe } from 'src/core/pipes/validation.pipe';
+import { Public } from '../auth/public.decorator';
 
 @Controller('menu-calculator')
 @UsePipes(new ValidationPipe())
@@ -19,6 +20,7 @@ export class MenuCalculatorController extends CoreControllerV2<
     super(menuCalculatorService, CreateMenuDto, UpdateMenuDto);
   }
 
+  @Public()
   @Get('find-by-calories/:calories')
   async findByCalories(@Param('calories', ParseIntPipe) calories: number) {
     return this.menuCalculatorService.findByCalories(Number(calories));
