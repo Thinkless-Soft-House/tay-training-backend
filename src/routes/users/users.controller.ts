@@ -46,7 +46,7 @@ export class UsersController extends CoreController<
     const salt = bcrypt.genSaltSync(saltRounds);
     const passwordHash = bcrypt.hashSync(password, salt);
 
-    console.log('hash', passwordHash);
+    // console.log('hash', passwordHash);
     return passwordHash;
   }
 }

@@ -113,16 +113,124 @@ let TrainingSheetService = class TrainingSheetService extends core_service_servi
                 await this.fileService.createFile(fileConfig.path, fileConfig.filename, file);
                 updateDto.pdfPath = fileConfig.path;
             }
-            console.log(updateDto);
             const dto = Object.assign({ id }, updateDto);
             const newItem = this.repository.create(dto);
-            console.log(newItem);
             await this.repository.update(id, newItem);
             return await this.repository.findOne({ where: whereId });
         }
         catch (error) {
             throw (0, typeorm_utils_1.translateTypeORMError)(error);
         }
+    }
+    async getPlannerHomeData(slug) {
+        const query = this.repository
+            .createQueryBuilder('trainingSheet')
+            .leftJoinAndSelect('trainingSheet.trainingDays', 'trainingDays')
+            .select([
+            'trainingSheet.id',
+            'trainingSheet.publicName',
+            'trainingSheet.slug',
+            'trainingSheet.pdfPath',
+            'trainingDays.id',
+            'trainingDays.day',
+        ])
+            .where('trainingSheet.slug = :slug', { slug });
+        return await query.getOne();
+    }
+    async getWeekData(slug, weekNumber) {
+        const startDay = weekNumber * 7 - 6;
+        const endDay = weekNumber * 7;
+        const query = this.repository
+            .createQueryBuilder('workout')
+            .leftJoinAndSelect('workout.trainingDays', 'trainingDays', 'trainingDays.day BETWEEN :startDay AND :endDay', { startDay, endDay })
+            .leftJoinAndSelect('trainingDays.exerciseGroup', 'exerciseGroup')
+            .leftJoinAndSelect('exerciseGroup.category', 'category')
+            .select([
+            'workout.publicName',
+            'trainingDays.day',
+            'trainingDays.shortName',
+            'exerciseGroup.publicName',
+        ])
+            .where('workout.slug = :slug', { slug });
+        const planner = await query.getOne();
+        const weekDays = [];
+        for (let i = startDay; i <= endDay; i++) {
+            const day = planner === null || planner === void 0 ? void 0 : planner.trainingDays.find((td) => td.day === i);
+            if (day) {
+                weekDays.push({
+                    day: day.day,
+                    shortName: day.shortName,
+                    exerciseGroup: day.exerciseGroup
+                        ? { publicName: day.exerciseGroup.publicName }
+                        : null,
+                });
+            }
+            else {
+                weekDays.push(null);
+            }
+        }
+        weekDays.splice(0, 1);
+        return {
+            id: planner === null || planner === void 0 ? void 0 : planner.id,
+            publicName: planner === null || planner === void 0 ? void 0 : planner.publicName,
+            slug: planner === null || planner === void 0 ? void 0 : planner.slug,
+            weekDays,
+        };
+    }
+    async getWorkoutDetail(slug, week, workoutIndex) {
+        const startDay = week * 7 - 6;
+        const endDay = week * 7;
+        const dayNumber = startDay + workoutIndex + 1;
+        const query = this.repository
+            .createQueryBuilder('trainingSheet')
+            .leftJoinAndSelect('trainingSheet.trainingDays', 'trainingDay', 'trainingDay.day = :dayNumber', { dayNumber })
+            .leftJoinAndSelect('trainingDay.exerciseGroup', 'exerciseGroup')
+            .leftJoinAndSelect('exerciseGroup.exerciseMethods', 'exerciseMethod')
+            .leftJoinAndSelect('exerciseMethod.exerciseConfigurations', 'exerciseConfiguration')
+            .leftJoinAndSelect('exerciseConfiguration.exercise', 'exercise')
+            .leftJoinAndSelect('exerciseConfiguration.method', 'method')
+            .select([
+            'trainingSheet.publicName',
+            'exerciseGroup.publicName',
+            'exerciseMethod.rest',
+            'exerciseMethod.observations',
+            'exerciseConfiguration.id',
+            'exerciseConfiguration.series',
+            'exerciseConfiguration.reps',
+            'exercise.name',
+            'exercise.videoUrl',
+            'method.name',
+            'trainingSheet.id',
+            'trainingDay.id',
+            'exerciseGroup.id',
+            'exerciseMethod.id',
+            'exercise.id',
+            'method.id',
+        ])
+            .where('trainingSheet.slug = :slug', { slug });
+        const trainingSheet = await query.getOne();
+        if (!trainingSheet) {
+            throw new common_1.NotFoundException('Treino não encontrado');
+        }
+        const trainingDay = trainingSheet.trainingDays[0];
+        if (!trainingDay) {
+            throw new common_1.NotFoundException('Dia de treino não encontrado');
+        }
+        const exerciseGroup = trainingDay.exerciseGroup;
+        if (!exerciseGroup) {
+            throw new common_1.NotFoundException('Grupo de exercícios não encontrado');
+        }
+        return {
+            id: trainingSheet.id,
+            publicName: trainingSheet.publicName,
+            slug: trainingSheet.slug,
+            workout: {
+                id: exerciseGroup.id,
+                publicName: exerciseGroup.publicName,
+                observations: exerciseGroup.observations || '',
+                exerciseMethods: exerciseGroup.exerciseMethods,
+            },
+        };
     }
 };
 TrainingSheetService = __decorate([

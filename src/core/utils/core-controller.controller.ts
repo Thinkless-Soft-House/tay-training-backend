@@ -97,7 +97,7 @@ export class CoreController<
   @Patch('single/:id')
   async update(@Param('id') id: string, @Body() updateDto: UpdateDTO) {
     try {
-      console.log('teste');
+      // console.log('teste');
       const update$: Entity = await this.service.update(+id, updateDto);
       return update$;
     } catch (error) {

@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.translateTypeORMError = exports.translateErrorMessage = void 0;
 const typeorm_1 = require("typeorm");
 function translateErrorMessage(message) {
-    console.log('message', message);
     if (message.includes('duplicate key value')) {
         return 'Valor duplicado. A operação viola a restrição de chave única.';
     }

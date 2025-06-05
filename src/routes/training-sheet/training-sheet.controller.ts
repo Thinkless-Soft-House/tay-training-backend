@@ -2,7 +2,9 @@ import {
   Body,
   Controller,
   Get,
+  NotFoundException,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Res,
@@ -20,6 +22,9 @@ import { CreateUserDto } from '../users/dto/create-user.dto';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { MulterFile } from 'multer';
 import { Response } from 'express';
+import { Public } from '../auth/jwt-auth.guard';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
+import { CustomCacheInterceptor } from 'src/core/inteceptors/cache.interceptor';
 
 @Controller('training-sheet')
 export class TrainingSheetController extends CoreController<
@@ -42,9 +47,9 @@ export class TrainingSheetController extends CoreController<
     },
   ) {
     try {
-      console.log(
-        'TrainingSheetController.createWithFile() => Criando um novo treino com arquivo',
-      );
+      // console.log(
+      //   'TrainingSheetController.createWithFile() => Criando um novo treino com arquivo',
+      // );
       // console.log(
       //   'TrainingSheetController.createWithFile() => file',
       //   file.file[0].buffer,
@@ -53,13 +58,13 @@ export class TrainingSheetController extends CoreController<
       // return { ok: true };
       let create$;
       if (file && !!file.file) {
-        console.log('has file, file.file => ', file.file);
+        // console.log('has file, file.file => ', file.file);
         create$ = await this.service.createWithFile(
           { ...createDto, trainingDays: JSON.parse(createDto.trainingDays) },
           file.file[0].buffer,
         );
       } else {
-        console.log('has no file');
+        // console.log('has no file');
         create$ = await this.service.create({
           ...createDto,
           trainingDays: JSON.parse(createDto.trainingDays),
@@ -87,21 +92,21 @@ export class TrainingSheetController extends CoreController<
     },
   ) {
     try {
-      console.log(
-        'TrainingSheetController.updateWithFile() => Atualizando um treino com arquivo',
-      );
+      // console.log(
+      //   'TrainingSheetController.updateWithFile() => Atualizando um treino com arquivo',
+      // );
 
       let update$;
 
       if (file && file.file) {
-        console.log('has file');
+        // console.log('has file');
         update$ = await this.service.updateWithFile(
           +id,
           updateDto,
           file.file[0].buffer,
         );
       } else {
-        console.log('has no file');
+        // console.log('has no file');
         update$ = await this.service.update(+id, updateDto);
       }
       return update$;
@@ -114,6 +119,7 @@ export class TrainingSheetController extends CoreController<
     }
   }
 
+  @Public()
   @Get('file/:id')
   async getFile(@Param('id') id: string, @Res() res: Response) {
     try {
@@ -127,5 +133,40 @@ export class TrainingSheetController extends CoreController<
         error.response?.statusCode || 400,
       );
     }
+  }
+
+  @Public()
+  @UseInterceptors(CustomCacheInterceptor)
+  @CacheTTL(10 * 60 * 1000) // 10 minutos
+  @Get('planner-home/:slug')
+  async getPlannerHome(@Param('slug') slug: string) {
+    return await this.service.getPlannerHomeData(slug);
+  }
+
+  @Public()
+  @UseInterceptors(CustomCacheInterceptor)
+  @CacheTTL(10 * 60 * 1000) // 10 minutos
+  @Get('week/:slug/:week')
+  async getWeekData(@Param('slug') slug: string, @Param('week') week: string) {
+    const weekNumber = parseInt(week, 10);
+    if (isNaN(weekNumber) || weekNumber < 1 || weekNumber > 4) {
+      throw new NotFoundException('Semana inválida');
+    }
+    return await this.service.getWeekData(slug, weekNumber);
+  }
+
+  @Public()
+  @UseInterceptors(CustomCacheInterceptor)
+  @Get('workout-detail/:slug/:week/:workout')
+  @CacheTTL(10 * 60 * 1000) // 10 minutos
+  async getWorkoutDetail(
+    @Param('slug') slug: string,
+    @Param('week', ParseIntPipe) week: number,
+    @Param('workout', ParseIntPipe) workoutIndex: number,
+  ) {
+    if (isNaN(week) || week < 1 || week > 4) {
+      throw new NotFoundException('Semana inválida');
+    }
+    return await this.service.getWorkoutDetail(slug, week, workoutIndex);
   }
 }

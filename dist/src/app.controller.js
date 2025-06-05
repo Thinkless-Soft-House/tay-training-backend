@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppController = void 0;
 const common_1 = require("@nestjs/common");
 const app_service_1 = require("./app.service");
+const jwt_auth_guard_1 = require("./routes/auth/jwt-auth.guard");
 let AppController = class AppController {
     constructor(appService) {
         this.appService = appService;
@@ -30,18 +31,21 @@ let AppController = class AppController {
     }
 };
 __decorate([
+    (0, jwt_auth_guard_1.Public)(),
     (0, common_1.Get)(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", String)
 ], AppController.prototype, "getHello", null);
 __decorate([
+    (0, jwt_auth_guard_1.Public)(),
     (0, common_1.Get)('abc'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", String)
 ], AppController.prototype, "getHello2", null);
 __decorate([
+    (0, jwt_auth_guard_1.Public)(),
     (0, common_1.Get)('def'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),

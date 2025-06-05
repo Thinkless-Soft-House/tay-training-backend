@@ -12,20 +12,16 @@ const fs = require("fs");
 const path = require("path");
 let FileService = class FileService {
     async createFile(path, name, file) {
-        console.log('FileService.createFile() => Criando/Atualizando um novo arquivo');
         fs.mkdirSync(path, { recursive: true });
         if (fs.existsSync(`${path}${name}`)) {
             await fs.promises.writeFile(`${path}${name}`, file);
-            console.log(`Arquivo ${name} atualizado em ${path}`);
         }
         else {
             await fs.promises.writeFile(`${path}${name}`, file);
-            console.log(`Arquivo salvo como ${name} em ${path}`);
         }
         return;
     }
     async getFile(route, name) {
-        console.log('FileService.createFile() => Criando um novo arquivo');
         const fullPath = path.join(route, name);
         if (fs.existsSync(fullPath)) {
             const fileBuffer = fs.readFileSync(fullPath);

@@ -8,6 +8,6 @@ export declare class TrainingDayController extends CoreController<TrainingDay, T
     constructor(trainingDayService: TrainingDayService);
     updateListOfExerciseGroups(body: TrainingDay[]): Promise<{
         new: TrainingDay[];
-        deleted: TrainingDay[];
+        deleted: boolean[];
     }>;
 }

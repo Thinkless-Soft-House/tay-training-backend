@@ -60,15 +60,12 @@ let ExerciseConfigurationsService = class ExerciseConfigurationsService extends 
             if (newOnes.length > 0) {
                 n = await this.createManyQueryRunner(queryRunner, newOnes);
             }
-            console.log('newOnes', newOnes);
             if (deletedOnes.length > 0) {
                 d = await this.deleteManyQueryRunner(queryRunner, deletedOnes);
             }
-            console.log('deletedOnes', deletedOnes);
             if (updatedOnes.length > 0) {
                 u = await this.updateManyQueryRunner(queryRunner, updatedOnes);
             }
-            console.log('updatedOnes', updatedOnes);
             await new Promise((resolve) => setTimeout(resolve, 100));
             await queryRunner.commitTransaction();
             return { new: n, deleted: d, updated: u };
@@ -93,7 +90,6 @@ let ExerciseConfigurationsService = class ExerciseConfigurationsService extends 
             return createdItems.length;
         }
         catch (error) {
-            console.log(error);
             throw (0, typeorm_utils_1.translateTypeORMError)(error);
         }
     }
@@ -109,7 +105,6 @@ let ExerciseConfigurationsService = class ExerciseConfigurationsService extends 
             return deleteResult.length;
         }
         catch (error) {
-            console.log(error);
             throw (0, typeorm_utils_1.translateTypeORMError)(error);
         }
     }
@@ -124,7 +119,6 @@ let ExerciseConfigurationsService = class ExerciseConfigurationsService extends 
             return updatedItems.filter((item) => item !== undefined).length;
         }
         catch (error) {
-            console.log(error);
             throw (0, typeorm_utils_1.translateTypeORMError)(error);
         }
     }
