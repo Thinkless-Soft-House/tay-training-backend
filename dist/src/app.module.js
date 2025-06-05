@@ -23,6 +23,7 @@ const exercise_group_categories_module_1 = require("./routes/exercise-group-cate
 const users_module_1 = require("./routes/users/users.module");
 const auth_module_1 = require("./routes/auth/auth.module");
 const ormconfig_1 = require("./core/database/ormconfig");
+const jwt_auth_guard_1 = require("./routes/auth/jwt-auth.guard");
 const cache_manager_1 = require("@nestjs/cache-manager");
 const menu_calculator_module_1 = require("./routes/menu-calculator/menu-calculator.module");
 let AppModule = class AppModule {
@@ -43,7 +44,6 @@ AppModule = __decorate([
             typeorm_1.TypeOrmModule.forRootAsync({
                 imports: [config_1.ConfigModule],
                 useFactory: (configService) => {
-                    console.log('configService.get("POSTGRES_HOST")', configService.get('POSTGRES_HOST'));
                     const ormconfig = (0, ormconfig_1.default)({
                         host: configService.get('POSTGRES_HOST'),
                         port: configService.get('POSTGRES_PORT'),
@@ -72,7 +72,13 @@ AppModule = __decorate([
             auth_module_1.AuthModule,
         ],
         controllers: [app_controller_1.AppController],
-        providers: [app_service_1.AppService],
+        providers: [
+            app_service_1.AppService,
+            {
+                provide: 'APP_GUARD',
+                useClass: jwt_auth_guard_1.JwtAuthGuard,
+            },
+        ],
     })
 ], AppModule);
 exports.AppModule = AppModule;

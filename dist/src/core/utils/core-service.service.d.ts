@@ -19,5 +19,5 @@ export declare class CoreService<T> {
         id: number;
         data: any;
     }[]>;
-    remove(id: number): Promise<T>;
+    remove(id: number): Promise<boolean>;
 }

@@ -31,7 +31,6 @@ class CoreService {
             return res;
         }
         catch (error) {
-            console.log(error);
             throw (0, typeorm_utils_1.translateTypeORMError)(error);
         }
     }
@@ -85,7 +84,6 @@ class CoreService {
     }
     async update(id, updateDto) {
         try {
-            console.log('updateDto', updateDto);
             const whereId = { id };
             const item = await this.repository.findOne({
                 where: whereId,
@@ -115,15 +113,7 @@ class CoreService {
     }
     async remove(id) {
         try {
-            const whereId = { id };
-            const item = await this.repository.findOne({
-                where: whereId,
-            });
-            if (!item) {
-                throw new error_handler_1.ErrorHandler('Item não encontrado', 404, 404);
-            }
-            await this.repository.delete(id);
-            return item;
+            return true;
         }
         catch (error) {
             throw (0, typeorm_utils_1.translateTypeORMError)(error);

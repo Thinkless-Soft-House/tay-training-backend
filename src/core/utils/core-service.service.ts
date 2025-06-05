@@ -41,7 +41,7 @@ export class CoreService<T> {
       // const res = await Promise.all(items);
       return res;
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       throw translateTypeORMError(error);
     }
   }
@@ -101,7 +101,7 @@ export class CoreService<T> {
   async update(id: number, updateDto: any) {
     try {
       // Check if item exists
-      console.log('updateDto', updateDto);
+      // console.log('updateDto', updateDto);
 
       const whereId: any = { id };
       const item = await this.repository.findOne({
@@ -139,19 +139,20 @@ export class CoreService<T> {
 
   async remove(id: number) {
     try {
-      // Check if item exists
-      const whereId: any = { id };
-      const item = await this.repository.findOne({
-        where: whereId,
-      });
+      return true;
+      // // Check if item exists
+      // const whereId: any = { id };
+      // const item = await this.repository.findOne({
+      //   where: whereId,
+      // });
 
-      if (!item) {
-        throw new ErrorHandler('Item não encontrado', 404, 404);
-      }
+      // if (!item) {
+      //   throw new ErrorHandler('Item não encontrado', 404, 404);
+      // }
 
-      // Delete item
-      await this.repository.delete(id);
-      return item;
+      // // Delete item
+      // await this.repository.delete(id);
+      // return item;
     } catch (error) {
       throw translateTypeORMError(error);
     }

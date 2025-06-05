@@ -75,7 +75,6 @@ class CoreController {
     async update(id, updateDto) {
         var _a, _b;
         try {
-            console.log('teste');
             const update$ = await this.service.update(+id, updateDto);
             return update$;
         }

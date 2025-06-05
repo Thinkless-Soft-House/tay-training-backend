@@ -9,18 +9,22 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.JwtAuthGuard = void 0;
+exports.JwtAuthGuard = exports.Public = exports.IS_PUBLIC_KEY = void 0;
 const common_1 = require("@nestjs/common");
 const core_1 = require("@nestjs/core");
 const passport_1 = require("@nestjs/passport");
-const public_decorator_1 = require("./public.decorator");
+const common_2 = require("@nestjs/common");
+const core_1 = require("@nestjs/core");
+exports.IS_PUBLIC_KEY = 'isPublic';
+const Public = () => (0, common_2.SetMetadata)(exports.IS_PUBLIC_KEY, true);
+exports.Public = Public;
 let JwtAuthGuard = class JwtAuthGuard extends (0, passport_1.AuthGuard)('jwt') {
     constructor(reflector) {
         super();
         this.reflector = reflector;
     }
     canActivate(context) {
-        const isPublic = this.reflector.getAllAndOverride(public_decorator_1.IS_PUBLIC_KEY, [
+        const isPublic = this.reflector.getAllAndOverride(exports.IS_PUBLIC_KEY, [
             context.getHandler(),
             context.getClass(),
         ]);
