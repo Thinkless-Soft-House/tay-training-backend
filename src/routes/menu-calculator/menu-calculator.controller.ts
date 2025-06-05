@@ -7,7 +7,6 @@ import { Menu } from './entities/menu.entity';
 import { CoreControllerV2 } from 'src/core/utils/core-controller-v2.controller';
 import { ValidationPipe } from 'src/core/pipes/validation.pipe';
 import { Public } from '../auth/jwt-auth.guard';
-
 @Controller('menu-calculator')
 @UsePipes(new ValidationPipe())
 export class MenuCalculatorController extends CoreControllerV2<
