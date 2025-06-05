@@ -6,10 +6,13 @@ import { ErrorHandler } from '../handlers/error.handler';
 @Injectable()
 export class ValidationPipe implements PipeTransform<any> {
   async transform(value: any, { metatype }: ArgumentMetadata) {
+
     if (!metatype || !this.toValidate(metatype)) {
       return value;
     }
+    
     const object = plainToInstance(metatype, value);
+
     try {
       await validateOrReject(object, {
         whitelist: true,
@@ -19,6 +22,18 @@ export class ValidationPipe implements PipeTransform<any> {
       });
       return value;
     } catch (errors) {
+      
+      if (Array.isArray(errors)) {
+        errors.forEach((error, index) => {
+          console.error(`Erro de validação ${index + 1}:`, error);
+          if (error.constraints) {
+            Object.keys(error.constraints).forEach(key => {
+              console.error(`  - ${key}: ${error.constraints[key]}`);
+            });
+          }
+        });
+      }
+
       throw new ErrorHandler('Falha na validação dos dados', 400, 400, {
         errors,
       });
@@ -26,7 +41,10 @@ export class ValidationPipe implements PipeTransform<any> {
   }
 
   private toValidate(metatype: any): boolean {
+    
     const types: any[] = [String, Boolean, Number, Array, Object];
-    return !types.includes(metatype);
+    const shouldValidate = !types.includes(metatype);
+    
+    return shouldValidate;
   }
 }
