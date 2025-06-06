@@ -1,4 +1,21 @@
-import { Controller, UsePipes, Get, Query, Param, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  UsePipes,
+  Get,
+  Query,
+  Param,
+  ParseIntPipe,
+  Post,
+  Patch,
+  Body,
+  UploadedFiles,
+  UseInterceptors,
+  StreamableFile,
+  Header,
+  Res,
+} from '@nestjs/common';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { createReadStream } from 'fs';
 import { CoreController } from 'src/core/utils/core-controller.controller';
 import { MenuCalculatorService } from './menu-calculator.service';
 import { CreateMenuDto } from './dto/create-menu.dto';
@@ -23,5 +40,43 @@ export class MenuCalculatorController extends CoreControllerV2<
   @Get('find-by-calories/:calories')
   async findByCalories(@Param('calories', ParseIntPipe) calories: number) {
     return this.menuCalculatorService.findByCalories(Number(calories));
+  }
+
+  @Post()
+  @UseInterceptors(FileFieldsInterceptor([{ name: 'file', maxCount: 1 }]))
+  async createWithFile(
+    @Body() createDto: any,
+    @UploadedFiles()
+    file: {
+      file?: any[];
+    },
+  ) {
+    return this.menuCalculatorService.createWithFile(createDto, file?.file?.[0]);
+  }
+
+  @Patch('single/:id')
+  @UseInterceptors(FileFieldsInterceptor([{ name: 'file', maxCount: 1 }]))
+  async updateWithFile(
+    @Param('id') id: string,
+    @Body() updateDto: any,
+    @UploadedFiles()
+    file: {
+      file?: any[];
+    },
+  ) {
+    return this.menuCalculatorService.updateWithFile(+id, updateDto, file?.file?.[0]);
+  }
+
+  @Public()
+  @Get('file/:id')
+  async getFile(@Param('id') id: string, @Res({ passthrough: true }) res): Promise<StreamableFile> {
+    const filePath = await this.menuCalculatorService.getFilePath(+id);
+    const fileName = filePath.split('/').pop() || 'arquivo.pdf';
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="${fileName}"`,
+    });
+    const fileStream = createReadStream(filePath);
+    return new StreamableFile(fileStream);
   }
 }

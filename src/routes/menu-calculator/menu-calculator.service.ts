@@ -1,7 +1,9 @@
+import { FileService } from 'src/core/services/File.service';
+import { ErrorHandler } from 'src/core/handlers/error.handler';
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Menu } from './entities/menu.entity';
 import { ILike, Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
 import { CoreService } from 'src/core/utils/core-service.service';
 
 @Injectable()
@@ -9,6 +11,7 @@ export class MenuCalculatorService extends CoreService<Menu> {
   constructor(
     @InjectRepository(Menu)
     private menuRepository: Repository<Menu>,
+    private fileService: FileService,
   ) {
     super(menuRepository);
   }
@@ -101,5 +104,69 @@ export class MenuCalculatorService extends CoreService<Menu> {
     }
 
     return menu;
+  }
+
+  // Sobrescreve o método create para garantir que sempre retorna um único Menu
+  override async create(createDto: any): Promise<any> {
+    try {
+      const newItem = this.menuRepository.create(createDto);
+      return await this.menuRepository.save(newItem);
+    } catch (error) {
+      throw new ErrorHandler(error.message, 400, 400);
+    }
+  }
+
+  async createWithFile(createDto: any, file: any): Promise<Menu[]> {
+    try {
+      let pdfUrl = '';
+      if (file) {
+        // Gera nome seguro para o arquivo baseado no nome do menu
+        const safeName = String(createDto.name || 'menu')
+          .toLowerCase()
+          .replace(/[^a-z0-9]/gi, '_')
+          .replace(/_+/g, '_')
+          .replace(/^_+|_+$/g, '');
+        const fileName = `menu_${safeName}.pdf`;
+        const filePath = './files/menus/';
+        await this.fileService.createFile(filePath, fileName, file.buffer);
+        pdfUrl = `${filePath}${fileName}`;
+      }
+      // Cria o registro já com o pdfUrl correto
+      const newItem = this.menuRepository.create({ ...createDto, pdfUrl });
+      const created = await this.menuRepository.save(newItem);
+      return created;
+    } catch (error) {
+      throw new ErrorHandler(error.message, 400, 400);
+    }
+  }
+
+  async updateWithFile(id: number, updateDto: any, file: any): Promise<Menu> {
+    try {
+      const item = await this.menuRepository.findOne({ where: { id } });
+      if (!item) throw new ErrorHandler('Item não encontrado', 404, 404);
+      let pdfUrl = updateDto.pdfUrl || item.pdfUrl;
+      if (file) {
+        const safeName = String(updateDto.name || item.name || 'menu')
+          .toLowerCase()
+          .replace(/[^a-z0-9]/gi, '_')
+          .replace(/_+/g, '_')
+          .replace(/^_+|_+$/g, '');
+        const fileName = `menu_${safeName}.pdf`;
+        const filePath = './files/menus/';
+        await this.fileService.createFile(filePath, fileName, file.buffer);
+        pdfUrl = `${filePath}${fileName}`;
+      }
+      const dto = { ...item, ...updateDto, pdfUrl };
+      await this.menuRepository.update(id, dto);
+      return await this.menuRepository.findOne({ where: { id } });
+    } catch (error) {
+      throw new ErrorHandler(error.message, 400, 400);
+    }
+  }
+
+  async getFilePath(id: number): Promise<string> {
+    const item = await this.menuRepository.findOne({ where: { id } });
+    if (!item || !item.pdfUrl) throw new ErrorHandler('Arquivo não encontrado', 404, 404);
+    return item.pdfUrl;
   }
 }
