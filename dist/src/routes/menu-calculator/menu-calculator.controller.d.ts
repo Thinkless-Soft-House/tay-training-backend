@@ -15,4 +15,5 @@ export declare class MenuCalculatorController extends CoreControllerV2<Menu, Men
         file?: any[];
     }): Promise<Menu>;
     getFile(id: string, res: any): Promise<StreamableFile>;
+    getPdfByCalories(calories: number, res: any): Promise<StreamableFile | void>;
 }
