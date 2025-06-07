@@ -13,15 +13,18 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MenuCalculatorService = void 0;
+const File_service_1 = require("../../core/services/File.service");
+const error_handler_1 = require("../../core/handlers/error.handler");
 const common_1 = require("@nestjs/common");
+const typeorm_1 = require("@nestjs/typeorm");
 const menu_entity_1 = require("./entities/menu.entity");
-const typeorm_1 = require("typeorm");
-const typeorm_2 = require("@nestjs/typeorm");
+const typeorm_2 = require("typeorm");
 const core_service_service_1 = require("../../core/utils/core-service.service");
 let MenuCalculatorService = class MenuCalculatorService extends core_service_service_1.CoreService {
-    constructor(menuRepository) {
+    constructor(menuRepository, fileService) {
         super(menuRepository);
         this.menuRepository = menuRepository;
+        this.fileService = fileService;
     }
     createWhere(query) {
         let where = {};
@@ -45,7 +48,7 @@ let MenuCalculatorService = class MenuCalculatorService extends core_service_ser
                     return {};
                 }
                 else if (filter.operator === 'like') {
-                    return { [filter.field]: (0, typeorm_1.ILike)(filter.value) };
+                    return { [filter.field]: (0, typeorm_2.ILike)(filter.value) };
                 }
                 else if (filter.operator === '=' && isNumericField) {
                     return { [filter.field]: Number(filter.value) };
@@ -58,16 +61,16 @@ let MenuCalculatorService = class MenuCalculatorService extends core_service_ser
         }
         else {
             if (query.name)
-                where['name'] = (0, typeorm_1.ILike)(`%${query.name}%`);
+                where['name'] = (0, typeorm_2.ILike)(`%${query.name}%`);
             if (query.description)
-                where['description'] = (0, typeorm_1.ILike)(`%${query.description}%`);
+                where['description'] = (0, typeorm_2.ILike)(`%${query.description}%`);
             if (query.status)
                 where['status'] = query.status;
             if (query.filter) {
                 const aux = where;
                 where = [
-                    Object.assign(Object.assign({}, aux), { name: (0, typeorm_1.ILike)(`%${query.filter}%`) }),
-                    Object.assign(Object.assign({}, aux), { description: (0, typeorm_1.ILike)(`%${query.filter}%`) }),
+                    Object.assign(Object.assign({}, aux), { name: (0, typeorm_2.ILike)(`%${query.filter}%`) }),
+                    Object.assign(Object.assign({}, aux), { description: (0, typeorm_2.ILike)(`%${query.filter}%`) }),
                 ];
             }
         }
@@ -107,11 +110,74 @@ let MenuCalculatorService = class MenuCalculatorService extends core_service_ser
         }
         return menu;
     }
+    async create(createDto) {
+        try {
+            const newItem = this.menuRepository.create(createDto);
+            return await this.menuRepository.save(newItem);
+        }
+        catch (error) {
+            throw new error_handler_1.ErrorHandler(error.message, 400, 400);
+        }
+    }
+    async createWithFile(createDto, file) {
+        try {
+            let pdfUrl = '';
+            if (file) {
+                const safeName = String(createDto.name || 'menu')
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]/gi, '_')
+                    .replace(/_+/g, '_')
+                    .replace(/^_+|_+$/g, '');
+                const fileName = `menu_${safeName}.pdf`;
+                const filePath = './files/menus/';
+                await this.fileService.createFile(filePath, fileName, file.buffer);
+                pdfUrl = `${filePath}${fileName}`;
+            }
+            const newItem = this.menuRepository.create(Object.assign(Object.assign({}, createDto), { pdfUrl }));
+            const created = await this.menuRepository.save(newItem);
+            return created;
+        }
+        catch (error) {
+            throw new error_handler_1.ErrorHandler(error.message, 400, 400);
+        }
+    }
+    async updateWithFile(id, updateDto, file) {
+        try {
+            const item = await this.menuRepository.findOne({ where: { id } });
+            if (!item)
+                throw new error_handler_1.ErrorHandler('Item não encontrado', 404, 404);
+            let pdfUrl = updateDto.pdfUrl || item.pdfUrl;
+            if (file) {
+                const safeName = String(updateDto.name || item.name || 'menu')
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]/gi, '_')
+                    .replace(/_+/g, '_')
+                    .replace(/^_+|_+$/g, '');
+                const fileName = `menu_${safeName}.pdf`;
+                const filePath = './files/menus/';
+                await this.fileService.createFile(filePath, fileName, file.buffer);
+                pdfUrl = `${filePath}${fileName}`;
+            }
+            const dto = Object.assign(Object.assign(Object.assign({}, item), updateDto), { pdfUrl });
+            await this.menuRepository.update(id, dto);
+            return await this.menuRepository.findOne({ where: { id } });
+        }
+        catch (error) {
+            throw new error_handler_1.ErrorHandler(error.message, 400, 400);
+        }
+    }
+    async getFilePath(id) {
+        const item = await this.menuRepository.findOne({ where: { id } });
+        if (!item || !item.pdfUrl)
+            throw new error_handler_1.ErrorHandler('Arquivo não encontrado', 404, 404);
+        return item.pdfUrl;
+    }
 };
 MenuCalculatorService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, typeorm_2.InjectRepository)(menu_entity_1.Menu)),
-    __metadata("design:paramtypes", [typeorm_1.Repository])
+    __param(0, (0, typeorm_1.InjectRepository)(menu_entity_1.Menu)),
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        File_service_1.FileService])
 ], MenuCalculatorService);
 exports.MenuCalculatorService = MenuCalculatorService;
 //# sourceMappingURL=menu-calculator.service.js.map

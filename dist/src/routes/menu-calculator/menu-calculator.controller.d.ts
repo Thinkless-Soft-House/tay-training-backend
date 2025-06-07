@@ -1,3 +1,4 @@
+import { StreamableFile } from '@nestjs/common';
 import { MenuCalculatorService } from './menu-calculator.service';
 import { CreateMenuDto } from './dto/create-menu.dto';
 import { UpdateMenuDto } from './dto/update-menu.dto';
@@ -7,4 +8,11 @@ export declare class MenuCalculatorController extends CoreControllerV2<Menu, Men
     private readonly menuCalculatorService;
     constructor(menuCalculatorService: MenuCalculatorService);
     findByCalories(calories: number): Promise<Menu>;
+    createWithFile(createDto: any, file: {
+        file?: any[];
+    }): Promise<Menu[]>;
+    updateWithFile(id: string, updateDto: any, file: {
+        file?: any[];
+    }): Promise<Menu>;
+    getFile(id: string, res: any): Promise<StreamableFile>;
 }

@@ -12,13 +12,14 @@ const menu_calculator_service_1 = require("./menu-calculator.service");
 const typeorm_1 = require("@nestjs/typeorm");
 const menu_entity_1 = require("./entities/menu.entity");
 const menu_calculator_controller_1 = require("./menu-calculator.controller");
+const File_service_1 = require("../../core/services/File.service");
 let MenuCalculatorModule = class MenuCalculatorModule {
 };
 MenuCalculatorModule = __decorate([
     (0, common_1.Module)({
         imports: [typeorm_1.TypeOrmModule.forFeature([menu_entity_1.Menu])],
         controllers: [menu_calculator_controller_1.MenuCalculatorController],
-        providers: [menu_calculator_service_1.MenuCalculatorService],
+        providers: [menu_calculator_service_1.MenuCalculatorService, File_service_1.FileService],
     })
 ], MenuCalculatorModule);
 exports.MenuCalculatorModule = MenuCalculatorModule;
