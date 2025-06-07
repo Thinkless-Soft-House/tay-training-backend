@@ -48,6 +48,21 @@ let MenuCalculatorController = class MenuCalculatorController extends core_contr
         const fileStream = (0, fs_1.createReadStream)(filePath);
         return new common_1.StreamableFile(fileStream);
     }
+    async getPdfByCalories(calories, res) {
+        const menu = await this.menuCalculatorService.findByCalories(Number(calories));
+        if (!menu || !menu.pdfUrl) {
+            res.status(404).send('PDF não encontrado para este menu');
+            return;
+        }
+        const filePath = menu.pdfUrl;
+        const fileName = filePath.split('/').pop() || 'arquivo.pdf';
+        res.set({
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': `attachment; filename="${fileName}"`,
+        });
+        const fileStream = (0, fs_1.createReadStream)(filePath);
+        return new common_1.StreamableFile(fileStream);
+    }
 };
 __decorate([
     (0, jwt_auth_guard_1.Public)(),
@@ -85,6 +100,15 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], MenuCalculatorController.prototype, "getFile", null);
+__decorate([
+    (0, jwt_auth_guard_1.Public)(),
+    (0, common_1.Get)('find-by-calories/:calories/pdf'),
+    __param(0, (0, common_1.Param)('calories', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Res)({ passthrough: true })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", Promise)
+], MenuCalculatorController.prototype, "getPdfByCalories", null);
 MenuCalculatorController = __decorate([
     (0, common_1.Controller)('menu-calculator'),
     (0, common_1.UsePipes)(new validation_pipe_1.ValidationPipe()),

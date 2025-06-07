@@ -79,4 +79,22 @@ export class MenuCalculatorController extends CoreControllerV2<
     const fileStream = createReadStream(filePath);
     return new StreamableFile(fileStream);
   }
+
+  @Public()
+  @Get('find-by-calories/:calories/pdf')
+  async getPdfByCalories(@Param('calories', ParseIntPipe) calories: number, @Res({ passthrough: true }) res): Promise<StreamableFile | void> {
+    const menu = await this.menuCalculatorService.findByCalories(Number(calories));
+    if (!menu || !menu.pdfUrl) {
+      res.status(404).send('PDF não encontrado para este menu');
+      return;
+    }
+    const filePath = menu.pdfUrl;
+    const fileName = filePath.split('/').pop() || 'arquivo.pdf';
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="${fileName}"`,
+    });
+    const fileStream = createReadStream(filePath);
+    return new StreamableFile(fileStream);
+  }
 }
