@@ -1,3 +1,5 @@
+import * as fs from 'fs';
+import * as path from 'path';
 import { FileService } from 'src/core/services/File.service';
 import { ErrorHandler } from 'src/core/handlers/error.handler';
 import { Injectable, NotFoundException } from '@nestjs/common';
@@ -127,9 +129,13 @@ export class MenuCalculatorService extends CoreService<Menu> {
           .replace(/_+/g, '_')
           .replace(/^_+|_+$/g, '');
         const fileName = `menu_${safeName}.pdf`;
-        const filePath = './files/menus/';
-        await this.fileService.createFile(filePath, fileName, file.buffer);
-        pdfUrl = `${filePath}${fileName}`;
+        const fileDir = path.resolve(process.cwd(), 'files/menus');
+        if (!fs.existsSync(fileDir)) {
+          fs.mkdirSync(fileDir, { recursive: true });
+        }
+        const fullFilePath = path.join(fileDir, fileName);
+        await this.fileService.createFile(fileDir + '/', fileName, file.buffer);
+        pdfUrl = `./files/menus/${fileName}`;
       }
       // Cria o registro já com o pdfUrl correto
       const newItem = this.menuRepository.create({ ...createDto, pdfUrl });
@@ -152,9 +158,13 @@ export class MenuCalculatorService extends CoreService<Menu> {
           .replace(/_+/g, '_')
           .replace(/^_+|_+$/g, '');
         const fileName = `menu_${safeName}.pdf`;
-        const filePath = './files/menus/';
-        await this.fileService.createFile(filePath, fileName, file.buffer);
-        pdfUrl = `${filePath}${fileName}`;
+        const fileDir = path.resolve(process.cwd(), 'files/menus');
+        if (!fs.existsSync(fileDir)) {
+          fs.mkdirSync(fileDir, { recursive: true });
+        }
+        const fullFilePath = path.join(fileDir, fileName);
+        await this.fileService.createFile(fileDir + '/', fileName, file.buffer);
+        pdfUrl = `./files/menus/${fileName}`;
       }
       const dto = { ...item, ...updateDto, pdfUrl };
       await this.menuRepository.update(id, dto);
