@@ -136,7 +136,7 @@ export class TrainingSheetController extends CoreController<
   }
 
   @Public()
-  @UseInterceptors(CustomCacheInterceptor)
+  // @UseInterceptors(CustomCacheInterceptor)
   @CacheTTL(10 * 60 * 1000) // 10 minutos
   @Get('planner-home/:slug')
   async getPlannerHome(@Param('slug') slug: string) {
@@ -144,7 +144,7 @@ export class TrainingSheetController extends CoreController<
   }
 
   @Public()
-  @UseInterceptors(CustomCacheInterceptor)
+  // @UseInterceptors(CustomCacheInterceptor)
   @CacheTTL(10 * 60 * 1000) // 10 minutos
   @Get('week/:slug/:week')
   async getWeekData(@Param('slug') slug: string, @Param('week') week: string) {
@@ -156,7 +156,7 @@ export class TrainingSheetController extends CoreController<
   }
 
   @Public()
-  @UseInterceptors(CustomCacheInterceptor)
+  // @UseInterceptors(CustomCacheInterceptor)
   @Get('workout-detail/:slug/:week/:workout')
   @CacheTTL(10 * 60 * 1000) // 10 minutos
   async getWorkoutDetail(
