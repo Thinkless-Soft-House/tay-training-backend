@@ -50,6 +50,13 @@ export class CustomCacheInterceptor implements NestInterceptor {
     context: ExecutionContext,
     next: CallHandler,
   ): Promise<Observable<any>> {
+    // CACHE TEMPORARIAMENTE DESABILITADO PARA DEBUG DO PROBLEMA "FOLGA"
+    // Data: 18/06/2025 - Investigação do planner-v2
+    console.log('🚫 Cache desabilitado - executando sem cache');
+    return next.handle();
+
+    // CÓDIGO ORIGINAL COMENTADO PARA FACILITAR REATIVAÇÃO
+
     const key = this.trackBy(context);
     const ttlValueOrFactory =
       this.reflector.get(CACHE_TTL_METADATA, context.getHandler()) ??

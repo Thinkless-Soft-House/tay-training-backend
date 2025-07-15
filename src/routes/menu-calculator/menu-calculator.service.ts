@@ -35,7 +35,9 @@ export class MenuCalculatorService extends CoreService<Menu> {
     if (Array.isArray(filters) && filters.length > 0) {
       where = filters.map((filter: any) => {
         // Corrige: para campos numéricos, nunca use ILIKE
-        const isNumericField = ['minCalories', 'maxCalories'].includes(filter.field);
+        const isNumericField = ['minCalories', 'maxCalories'].includes(
+          filter.field,
+        );
         if (filter.operator === 'like' && isNumericField) {
           // Tenta extrair o número do valor (ex: '%2%' -> 2)
           const num = parseInt((filter.value || '').replace(/[^0-9]/g, ''));
@@ -55,7 +57,8 @@ export class MenuCalculatorService extends CoreService<Menu> {
     } else {
       // Fallback para filtros antigos
       if (query.name) where['name'] = ILike(`%${query.name}%`);
-      if (query.description) where['description'] = ILike(`%${query.description}%`);
+      if (query.description)
+        where['description'] = ILike(`%${query.description}%`);
       if (query.status) where['status'] = query.status;
       if (query.filter) {
         const aux = where;
@@ -67,26 +70,35 @@ export class MenuCalculatorService extends CoreService<Menu> {
     }
 
     // LOG para debug
-    console.log('[MenuCalculatorService] createWhere - query:', JSON.stringify(query));
-    console.log('[MenuCalculatorService] createWhere - where:', JSON.stringify(where));
+    console.log(
+      '[MenuCalculatorService] createWhere - query:',
+      JSON.stringify(query),
+    );
+    console.log(
+      '[MenuCalculatorService] createWhere - where:',
+      JSON.stringify(where),
+    );
 
     return where;
   }
 
   async findByCalories(calories: number) {
-    const menu = await this.menuRepository.createQueryBuilder('menu')
+    const menu = await this.menuRepository
+      .createQueryBuilder('menu')
       .where('menu.minCalories <= :mincalories', { mincalories: calories })
       .andWhere('menu.maxCalories >= :maxcalories', { maxcalories: calories })
       .orderBy('menu.minCalories', 'ASC')
       .getOne();
 
     if (!menu) {
-      const minprox = await this.menuRepository.createQueryBuilder('menu')
+      const minprox = await this.menuRepository
+        .createQueryBuilder('menu')
         .where('menu.minCalories <= :mincalories', { mincalories: calories })
         .orderBy('menu.minCalories', 'DESC')
         .getOne();
 
-      const maxprox = await this.menuRepository.createQueryBuilder('menu')
+      const maxprox = await this.menuRepository
+        .createQueryBuilder('menu')
         .where('menu.maxCalories >= :maxcalories', { maxcalories: calories })
         .orderBy('menu.maxCalories', 'ASC')
         .getOne();
@@ -101,7 +113,9 @@ export class MenuCalculatorService extends CoreService<Menu> {
       } else if (maxprox) {
         return maxprox;
       } else {
-        throw new NotFoundException('Nenhum menu encontrado para as calorias informadas');
+        throw new NotFoundException(
+          'Nenhum menu encontrado para as calorias informadas',
+        );
       }
     }
 
@@ -176,7 +190,37 @@ export class MenuCalculatorService extends CoreService<Menu> {
 
   async getFilePath(id: number): Promise<string> {
     const item = await this.menuRepository.findOne({ where: { id } });
-    if (!item || !item.pdfUrl) throw new ErrorHandler('Arquivo não encontrado', 404, 404);
+    if (!item || !item.pdfUrl)
+      throw new ErrorHandler('Arquivo não encontrado', 404, 404);
+
+    // Verificar se o arquivo existe fisicamente
+    if (!fs.existsSync(item.pdfUrl)) {
+      throw new ErrorHandler('Arquivo não encontrado no servidor', 404, 404);
+    }
+
     return item.pdfUrl;
+  }
+
+  async getFileInfo(
+    id: number,
+  ): Promise<{ path: string; size: number; exists: boolean }> {
+    try {
+      const item = await this.menuRepository.findOne({ where: { id } });
+      if (!item || !item.pdfUrl) {
+        return { path: '', size: 0, exists: false };
+      }
+
+      const filePath = item.pdfUrl;
+      const exists = fs.existsSync(filePath);
+
+      if (!exists) {
+        return { path: filePath, size: 0, exists: false };
+      }
+
+      const stats = fs.statSync(filePath);
+      return { path: filePath, size: stats.size, exists: true };
+    } catch (error) {
+      return { path: '', size: 0, exists: false };
+    }
   }
 }

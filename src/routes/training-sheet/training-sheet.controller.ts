@@ -25,6 +25,7 @@ import { Response } from 'express';
 import { Public } from '../auth/jwt-auth.guard';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { CustomCacheInterceptor } from 'src/core/inteceptors/cache.interceptor';
+import { existsSync, statSync } from 'fs';
 
 @Controller('training-sheet')
 export class TrainingSheetController extends CoreController<
@@ -123,15 +124,50 @@ export class TrainingSheetController extends CoreController<
   @Get('file/:id')
   async getFile(@Param('id') id: string, @Res() res: Response) {
     try {
+      // Primeiro, verificar se o treino existe
+      const trainingSheet = await this.service.findOne(+id);
+      if (!trainingSheet) {
+        res.status(404).json({ error: 'Treino não encontrado' });
+        return;
+      }
+
+      // Configuração do arquivo (igual ao service)
+      const fileConfig = {
+        filename: 'Treino_' + id + '.pdf',
+        path: './files/workouts/',
+      };
+
+      const fullPath = `${fileConfig.path}${fileConfig.filename}`;
+
+      // Verificar se o arquivo existe fisicamente
+      if (!existsSync(fullPath)) {
+        res.status(404).json({ error: 'Arquivo não encontrado no servidor' });
+        return;
+      }
+
+      // Obter informações do arquivo
+      const stats = statSync(fullPath);
+
+      // Obter o arquivo através do serviço
       const file = await this.service.getFile(+id);
-      res.set('Content-Type', 'application/pdf'); // Definir o tipo de conteúdo como application/pdf
+
+      // Configurar headers adequados
+      res.set({
+        'Content-Type': 'application/pdf',
+        'Content-Length': stats.size.toString(),
+        'Content-Disposition': `attachment; filename="${fileConfig.filename}"`,
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        Pragma: 'no-cache',
+        Expires: '0',
+      });
+
       res.send(file);
     } catch (error) {
-      throw new ErrorHandler(
-        error.message,
-        error.response?.errorCode || 400,
-        error.response?.statusCode || 400,
-      );
+      console.error('Erro no getFile (training-sheet):', error);
+      res.status(500).json({
+        error: 'Erro interno do servidor',
+        details: error.message,
+      });
     }
   }
 

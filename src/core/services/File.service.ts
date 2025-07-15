@@ -26,16 +26,19 @@ export class FileService {
     return;
   }
   async getFile(route: string, name: string) {
-    // console.log('FileService.createFile() => Criando um novo arquivo');
+    // console.log('FileService.getFile() => Obtendo arquivo');
     const fullPath = path.join(route, name);
 
-    if (fs.existsSync(fullPath)) {
-      const fileBuffer = fs.readFileSync(fullPath);
-      return fileBuffer;
-    } else {
-      throw new Error('Arquivo não encontrado');
+    // Verificar se o arquivo existe
+    if (!fs.existsSync(fullPath)) {
+      throw new Error(`Arquivo não encontrado: ${fullPath}`);
     }
 
-    return;
+    try {
+      const fileBuffer = fs.readFileSync(fullPath);
+      return fileBuffer;
+    } catch (error) {
+      throw new Error(`Erro ao ler arquivo: ${error.message}`);
+    }
   }
 }
