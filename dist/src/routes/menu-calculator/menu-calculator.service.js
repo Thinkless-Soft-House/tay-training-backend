@@ -76,22 +76,23 @@ let MenuCalculatorService = class MenuCalculatorService extends core_service_ser
                 ];
             }
         }
-        console.log('[MenuCalculatorService] createWhere - query:', JSON.stringify(query));
-        console.log('[MenuCalculatorService] createWhere - where:', JSON.stringify(where));
         return where;
     }
     async findByCalories(calories) {
-        const menu = await this.menuRepository.createQueryBuilder('menu')
+        const menu = await this.menuRepository
+            .createQueryBuilder('menu')
             .where('menu.minCalories <= :mincalories', { mincalories: calories })
             .andWhere('menu.maxCalories >= :maxcalories', { maxcalories: calories })
             .orderBy('menu.minCalories', 'ASC')
             .getOne();
         if (!menu) {
-            const minprox = await this.menuRepository.createQueryBuilder('menu')
+            const minprox = await this.menuRepository
+                .createQueryBuilder('menu')
                 .where('menu.minCalories <= :mincalories', { mincalories: calories })
                 .orderBy('menu.minCalories', 'DESC')
                 .getOne();
-            const maxprox = await this.menuRepository.createQueryBuilder('menu')
+            const maxprox = await this.menuRepository
+                .createQueryBuilder('menu')
                 .where('menu.maxCalories >= :maxcalories', { maxcalories: calories })
                 .orderBy('menu.maxCalories', 'ASC')
                 .getOne();
