@@ -9,21 +9,18 @@ export class AppController {
   @Public()
   @Get()
   getHello(): string {
-    console.log('getHello');
     return this.appService.getHello();
   }
 
   @Public()
   @Get('abc')
   getHello2(): string {
-    console.log('getHello2');
     return this.appService.getHello2();
   }
 
   @Public()
   @Get('def')
   getHello3(): string {
-    console.log('getHello3');
     return this.appService.getHello3();
   }
 }

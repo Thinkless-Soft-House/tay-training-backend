@@ -21,15 +21,8 @@ function IsMaxCaloriesGreaterThanMin(validationOptions) {
         name: 'isMaxCaloriesGreaterThanMin',
         validator: {
             validate: (value, args) => {
-                console.log('🔍 IsMaxCaloriesGreaterThanMin - VALIDAÇÃO CUSTOMIZADA');
-                console.log('📊 Valor recebido (maxCalories):', value);
-                console.log('🎯 Args completo:', args);
-                console.log('📦 Object completo:', JSON.stringify(args.object, null, 2));
                 const object = args.object;
-                console.log('🔢 minCalories:', object.minCalories);
-                console.log('🔢 maxCalories:', object.maxCalories);
                 const isValid = object.minCalories <= object.maxCalories;
-                console.log('✅ Validação resultado:', isValid);
                 return isValid;
             },
             defaultMessage: () => 'Calorias máximas devem ser maiores ou igual as mínimas',
@@ -59,7 +52,9 @@ __decorate([
 __decorate([
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.Min)(1, { message: 'Maximo de calorias deve ser maior do que 1' }),
-    IsMaxCaloriesGreaterThanMin({ message: 'Calorias máximas devem ser maiores ou igual as mínimas' }),
+    IsMaxCaloriesGreaterThanMin({
+        message: 'Calorias máximas devem ser maiores ou igual as mínimas',
+    }),
     __metadata("design:type", Number)
 ], CreateMenuDto.prototype, "maxCalories", void 0);
 __decorate([

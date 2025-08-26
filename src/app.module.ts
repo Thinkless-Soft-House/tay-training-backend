@@ -17,6 +17,7 @@ import createOrmconfig from './core/database/ormconfig';
 import { JwtAuthGuard } from './routes/auth/jwt-auth.guard';
 import { CacheModule } from '@nestjs/cache-manager';
 import { MenuCalculatorModule } from './routes/menu-calculator/menu-calculator.module';
+import { TrainingAccessModule } from './training-access/training-access.module';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { MenuCalculatorModule } from './routes/menu-calculator/menu-calculator.m
       max: 100, // Máximo de 100 itens no cache
     }),
     MenuCalculatorModule,
+    TrainingAccessModule,
     ExerciseGroupsModule,
     ExerciseMethodModule,
     ExerciseConfigurationsModule,

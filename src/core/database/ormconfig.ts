@@ -3,14 +3,7 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { join } from 'path';
 
-function createOrmConfig(connData: {
-  host: string;
-  port: string;
-  username: string;
-  password: string;
-  database: string;
-  synchronize: string;
-}): TypeOrmModuleOptions {
+function createOrmConfig(connData: any): TypeOrmModuleOptions {
   return {
     type: 'postgres',
     host: connData.host || 'localhost',
@@ -21,9 +14,17 @@ function createOrmConfig(connData: {
     entities: [join(__dirname, '../../**/*.entity{.ts,.js}')],
     synchronize: connData.synchronize === 'true',
     extra: {
-      ssl: {
-        rejectUnauthorized: false,
-      },
+      ssl: ((): any => {
+        const flag = (
+          connData.POSTGRES_SSL ??
+          connData.postgres_ssl ??
+          connData.postgresSsl ??
+          'false'
+        )
+          .toString()
+          .toLowerCase();
+        return flag === 'true' ? { rejectUnauthorized: false } : false;
+      })(),
     },
   };
 }

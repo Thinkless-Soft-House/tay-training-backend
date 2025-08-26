@@ -26,6 +26,7 @@ const ormconfig_1 = require("./core/database/ormconfig");
 const jwt_auth_guard_1 = require("./routes/auth/jwt-auth.guard");
 const cache_manager_1 = require("@nestjs/cache-manager");
 const menu_calculator_module_1 = require("./routes/menu-calculator/menu-calculator.module");
+const training_access_module_1 = require("./training-access/training-access.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -62,6 +63,7 @@ AppModule = __decorate([
                 max: 100,
             }),
             menu_calculator_module_1.MenuCalculatorModule,
+            training_access_module_1.TrainingAccessModule,
             exercise_groups_module_1.ExerciseGroupsModule,
             exercise_method_module_1.ExerciseMethodModule,
             exercise_configurations_module_1.ExerciseConfigurationsModule,

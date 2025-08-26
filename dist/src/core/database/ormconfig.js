@@ -12,9 +12,13 @@ function createOrmConfig(connData) {
         entities: [(0, path_1.join)(__dirname, '../../**/*.entity{.ts,.js}')],
         synchronize: connData.synchronize === 'true',
         extra: {
-            ssl: {
-                rejectUnauthorized: false,
-            },
+            ssl: (() => {
+                var _a, _b, _c;
+                const flag = ((_c = (_b = (_a = connData.POSTGRES_SSL) !== null && _a !== void 0 ? _a : connData.postgres_ssl) !== null && _b !== void 0 ? _b : connData.postgresSsl) !== null && _c !== void 0 ? _c : 'false')
+                    .toString()
+                    .toLowerCase();
+                return flag === 'true' ? { rejectUnauthorized: false } : false;
+            })(),
         },
     };
 }
