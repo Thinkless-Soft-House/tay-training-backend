@@ -120,21 +120,19 @@ export class MenuCalculatorController extends CoreControllerV2<
       }
     }
   }
+
 @Public()
 @Get('find-by-calories/:calories/pdf')
 async getPdfByCalories(
   @Param('calories', ParseIntPipe) calories: number,
   @Res() res: Response,
 ): Promise<void> {
-  let fileStream: ReadStream | null = null;
-  
   try {
-    console.log(`🔍 [${new Date().toISOString()}] Buscando PDF para ${calories} calorias`);
+    console.log(`🔍 Buscando PDF para ${calories} calorias`);
     
     const menu = await this.menuCalculatorService.findByCalories(Number(calories));
 
     if (!menu || !menu.pdfUrl) {
-      console.log(`❌ Menu ou PDF não encontrado para ${calories} calorias`);
       return res.status(404).json({ 
         error: 'PDF não encontrado',
         calories 
@@ -142,10 +140,8 @@ async getPdfByCalories(
     }
 
     const filePath = menu.pdfUrl;
-    console.log(`📂 Arquivo: ${filePath}`);
-
+    
     if (!existsSync(filePath)) {
-      console.log(`❌ Arquivo físico não existe: ${filePath}`);
       return res.status(404).json({ 
         error: 'Arquivo não encontrado no servidor' 
       });
@@ -154,88 +150,32 @@ async getPdfByCalories(
     const stats = statSync(filePath);
     const fileName = filePath.split('/').pop() || 'menu.pdf';
     
-    console.log(`📊 Arquivo OK - Tamanho: ${stats.size} bytes`);
+    console.log(`📊 Carregando arquivo: ${stats.size} bytes`);
 
-    // HEADERS OTIMIZADOS PARA QUIC
+    // ABORDAGEM COM BUFFER: Carrega arquivo inteiro na memória
+    // Mais seguro para PDFs pequenos/médios (até ~50MB)
+    const fileBuffer = readFileSync(filePath);
+    
     res.set({
       'Content-Type': 'application/pdf',
-      'Content-Length': stats.size.toString(),
+      'Content-Length': fileBuffer.length.toString(),
       'Content-Disposition': `inline; filename="${fileName}"`,
-      'Accept-Ranges': 'bytes',
       'Cache-Control': 'public, max-age=3600',
       'X-Content-Type-Options': 'nosniff',
-      // CRÍTICO: Headers para evitar QUIC issues
-      'Connection': 'keep-alive',
-      'Transfer-Encoding': 'identity', // Evita chunked encoding
     });
 
-    fileStream = createReadStream(filePath, {
-      highWaterMark: 64 * 1024, // Buffer de 64KB (padrão menor)
-    });
+    // Verificar se cliente ainda está conectado
+    if (res.destroyed || res.closed) {
+      console.log('⚠️ Cliente já desconectado, abortando envio');
+      return;
+    }
 
-    // PROTEÇÃO CONTRA QUIC ERRORS
-    let streamStarted = false;
-    let streamCompleted = false;
-
-    fileStream.on('open', () => {
-      console.log('✅ Stream iniciado');
-      streamStarted = true;
-    });
-
-    fileStream.on('data', (chunk) => {
-      // Verifica se a conexão ainda está ativa
-      if (res.destroyed || res.closed) {
-        console.log('⚠️ Conexão cliente fechada, interrompendo stream');
-        fileStream?.destroy();
-        return;
-      }
-    });
-
-    fileStream.on('end', () => {
-      console.log('✅ Stream finalizado com sucesso');
-      streamCompleted = true;
-    });
-
-    fileStream.on('error', (error) => {
-      console.error('❌ Erro no stream:', error);
-      if (!res.headersSent) {
-        res.status(500).json({ 
-          error: 'Erro ao processar arquivo',
-          details: error.message 
-        });
-      }
-    });
-
-    // Monitorar desconexão do cliente
-    res.on('close', () => {
-      console.log('🔌 Cliente desconectou');
-      if (fileStream && !streamCompleted) {
-        fileStream.destroy();
-      }
-    });
-
-    res.on('error', (error) => {
-      console.error('❌ Erro na resposta HTTP:', error);
-      if (fileStream) {
-        fileStream.destroy();
-      }
-    });
-
-    // PIPE COM TRATAMENTO DE ERRO
-    fileStream.pipe(res).on('error', (error) => {
-      console.error('❌ Erro no pipe:', error);
-      if (!res.headersSent) {
-        res.status(500).end();
-      }
-    });
+    console.log('📤 Enviando arquivo via buffer');
+    res.send(fileBuffer);
+    console.log('✅ Arquivo enviado com sucesso');
 
   } catch (error) {
-    console.error('❌ Erro geral:', error);
-    
-    // Limpar stream se existir
-    if (fileStream) {
-      fileStream.destroy();
-    }
+    console.error('❌ Erro:', error);
     
     if (!res.headersSent) {
       res.status(500).json({ 
