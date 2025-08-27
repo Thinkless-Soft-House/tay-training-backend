@@ -120,83 +120,123 @@ export class MenuCalculatorController extends CoreControllerV2<
       }
     }
   }
-
 @Public()
 @Get('find-by-calories/:calories/pdf')
 async getPdfByCalories(
   @Param('calories', ParseIntPipe) calories: number,
-  @Res() res: Response, // ❌ Remova { passthrough: true }
+  @Res() res: Response,
 ): Promise<void> {
+  let fileStream: ReadStream | null = null;
+  
   try {
-    console.log(`🔍 Buscando PDF para ${calories} calorias`);
+    console.log(`🔍 [${new Date().toISOString()}] Buscando PDF para ${calories} calorias`);
     
-    const menu = await this.menuCalculatorService.findByCalories(
-      Number(calories),
-    );
+    const menu = await this.menuCalculatorService.findByCalories(Number(calories));
 
     if (!menu || !menu.pdfUrl) {
-      console.log('❌ Menu ou PDF não encontrado');
-      res.status(404).json({ 
-        error: 'PDF não encontrado para este menu',
+      console.log(`❌ Menu ou PDF não encontrado para ${calories} calorias`);
+      return res.status(404).json({ 
+        error: 'PDF não encontrado',
         calories 
       });
-      return;
     }
 
     const filePath = menu.pdfUrl;
-    console.log(`📂 Caminho do arquivo: ${filePath}`);
+    console.log(`📂 Arquivo: ${filePath}`);
 
-    // Verificar se o arquivo existe
     if (!existsSync(filePath)) {
-      console.log('❌ Arquivo não existe no sistema');
-      res.status(404).json({ 
-        error: 'Arquivo PDF não encontrado no servidor',
-        path: filePath 
+      console.log(`❌ Arquivo físico não existe: ${filePath}`);
+      return res.status(404).json({ 
+        error: 'Arquivo não encontrado no servidor' 
       });
-      return;
     }
 
-    // Obter informações do arquivo
     const stats = statSync(filePath);
     const fileName = filePath.split('/').pop() || 'menu.pdf';
     
-    console.log(`📊 Arquivo encontrado - Tamanho: ${stats.size} bytes`);
+    console.log(`📊 Arquivo OK - Tamanho: ${stats.size} bytes`);
 
-    // ✅ Headers corretos para PDF
+    // HEADERS OTIMIZADOS PARA QUIC
     res.set({
       'Content-Type': 'application/pdf',
       'Content-Length': stats.size.toString(),
-      'Content-Disposition': `inline; filename="${fileName}"`, // inline em vez de attachment
-      'Accept-Ranges': 'bytes', // Permite range requests
-      'Cache-Control': 'public, max-age=3600', // Cache por 1 hora
+      'Content-Disposition': `inline; filename="${fileName}"`,
+      'Accept-Ranges': 'bytes',
+      'Cache-Control': 'public, max-age=3600',
+      'X-Content-Type-Options': 'nosniff',
+      // CRÍTICO: Headers para evitar QUIC issues
+      'Connection': 'keep-alive',
+      'Transfer-Encoding': 'identity', // Evita chunked encoding
     });
 
-    const fileStream = createReadStream(filePath);
+    fileStream = createReadStream(filePath, {
+      highWaterMark: 64 * 1024, // Buffer de 64KB (padrão menor)
+    });
 
-    // ✅ Tratamento robusto de erro
+    // PROTEÇÃO CONTRA QUIC ERRORS
+    let streamStarted = false;
+    let streamCompleted = false;
+
+    fileStream.on('open', () => {
+      console.log('✅ Stream iniciado');
+      streamStarted = true;
+    });
+
+    fileStream.on('data', (chunk) => {
+      // Verifica se a conexão ainda está ativa
+      if (res.destroyed || res.closed) {
+        console.log('⚠️ Conexão cliente fechada, interrompendo stream');
+        fileStream?.destroy();
+        return;
+      }
+    });
+
+    fileStream.on('end', () => {
+      console.log('✅ Stream finalizado com sucesso');
+      streamCompleted = true;
+    });
+
     fileStream.on('error', (error) => {
-      console.error('❌ Erro ao ler arquivo PDF:', error);
+      console.error('❌ Erro no stream:', error);
       if (!res.headersSent) {
         res.status(500).json({ 
-          error: 'Erro ao processar arquivo PDF',
+          error: 'Erro ao processar arquivo',
           details: error.message 
         });
       }
     });
 
-    fileStream.on('open', () => {
-      console.log('✅ Stream do arquivo iniciado');
+    // Monitorar desconexão do cliente
+    res.on('close', () => {
+      console.log('🔌 Cliente desconectou');
+      if (fileStream && !streamCompleted) {
+        fileStream.destroy();
+      }
     });
 
-    fileStream.on('end', () => {
-      console.log('✅ Stream do arquivo finalizado');
+    res.on('error', (error) => {
+      console.error('❌ Erro na resposta HTTP:', error);
+      if (fileStream) {
+        fileStream.destroy();
+      }
     });
 
-    // ✅ Pipe direto para resposta
-    fileStream.pipe(res);
+    // PIPE COM TRATAMENTO DE ERRO
+    fileStream.pipe(res).on('error', (error) => {
+      console.error('❌ Erro no pipe:', error);
+      if (!res.headersSent) {
+        res.status(500).end();
+      }
+    });
 
   } catch (error) {
-    console.error('❌ Erro geral no getPdfByCalories:', error);
+    console.error('❌ Erro geral:', error);
+    
+    // Limpar stream se existir
+    if (fileStream) {
+      fileStream.destroy();
+    }
+    
     if (!res.headersSent) {
       res.status(500).json({ 
         error: 'Erro interno do servidor',
