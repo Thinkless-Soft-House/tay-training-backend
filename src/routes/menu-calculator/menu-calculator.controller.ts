@@ -121,60 +121,88 @@ export class MenuCalculatorController extends CoreControllerV2<
     }
   }
 
-  @Public()
-  @Get('find-by-calories/:calories/pdf')
-  async getPdfByCalories(
-    @Param('calories', ParseIntPipe) calories: number,
-    @Res({ passthrough: true }) res,
-  ): Promise<StreamableFile | void> {
-    try {
-      const menu = await this.menuCalculatorService.findByCalories(
-        Number(calories),
-      );
+@Public()
+@Get('find-by-calories/:calories/pdf')
+async getPdfByCalories(
+  @Param('calories', ParseIntPipe) calories: number,
+  @Res() res: Response, // ❌ Remova { passthrough: true }
+): Promise<void> {
+  try {
+    console.log(`🔍 Buscando PDF para ${calories} calorias`);
+    
+    const menu = await this.menuCalculatorService.findByCalories(
+      Number(calories),
+    );
 
-      if (!menu || !menu.pdfUrl) {
-        res.status(404).send('PDF não encontrado para este menu');
-        return;
-      }
-
-      const filePath = menu.pdfUrl;
-
-      // Verificar se o arquivo existe
-      if (!existsSync(filePath)) {
-        res.status(404).send('Arquivo PDF não encontrado no servidor');
-        return;
-      }
-
-      // Obter informações do arquivo
-      const stats = statSync(filePath);
-      const fileName = filePath.split('/').pop() || 'menu.pdf';
-
-      // Configurar headers adequados
-      res.set({
-        'Content-Type': 'application/pdf',
-        'Content-Length': stats.size.toString(),
-        'Content-Disposition': `attachment; filename="${fileName}"`,
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        Pragma: 'no-cache',
-        Expires: '0',
+    if (!menu || !menu.pdfUrl) {
+      console.log('❌ Menu ou PDF não encontrado');
+      res.status(404).json({ 
+        error: 'PDF não encontrado para este menu',
+        calories 
       });
+      return;
+    }
 
-      const fileStream = createReadStream(filePath);
+    const filePath = menu.pdfUrl;
+    console.log(`📂 Caminho do arquivo: ${filePath}`);
 
-      // Adicionar tratamento de erro para o stream
-      fileStream.on('error', (error) => {
-        console.error('Erro ao ler arquivo PDF:', error);
-        if (!res.headersSent) {
-          res.status(500).send('Erro interno do servidor');
-        }
+    // Verificar se o arquivo existe
+    if (!existsSync(filePath)) {
+      console.log('❌ Arquivo não existe no sistema');
+      res.status(404).json({ 
+        error: 'Arquivo PDF não encontrado no servidor',
+        path: filePath 
       });
+      return;
+    }
 
-      return new StreamableFile(fileStream);
-    } catch (error) {
-      console.error('Erro no getPdfByCalories:', error);
+    // Obter informações do arquivo
+    const stats = statSync(filePath);
+    const fileName = filePath.split('/').pop() || 'menu.pdf';
+    
+    console.log(`📊 Arquivo encontrado - Tamanho: ${stats.size} bytes`);
+
+    // ✅ Headers corretos para PDF
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Length': stats.size.toString(),
+      'Content-Disposition': `inline; filename="${fileName}"`, // inline em vez de attachment
+      'Accept-Ranges': 'bytes', // Permite range requests
+      'Cache-Control': 'public, max-age=3600', // Cache por 1 hora
+    });
+
+    const fileStream = createReadStream(filePath);
+
+    // ✅ Tratamento robusto de erro
+    fileStream.on('error', (error) => {
+      console.error('❌ Erro ao ler arquivo PDF:', error);
       if (!res.headersSent) {
-        res.status(500).send('Erro interno do servidor');
+        res.status(500).json({ 
+          error: 'Erro ao processar arquivo PDF',
+          details: error.message 
+        });
       }
+    });
+
+    fileStream.on('open', () => {
+      console.log('✅ Stream do arquivo iniciado');
+    });
+
+    fileStream.on('end', () => {
+      console.log('✅ Stream do arquivo finalizado');
+    });
+
+    // ✅ Pipe direto para resposta
+    fileStream.pipe(res);
+
+  } catch (error) {
+    console.error('❌ Erro geral no getPdfByCalories:', error);
+    if (!res.headersSent) {
+      res.status(500).json({ 
+        error: 'Erro interno do servidor',
+        details: error.message 
+      });
     }
   }
+}
 }
