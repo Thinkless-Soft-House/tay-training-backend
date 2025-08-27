@@ -19,7 +19,7 @@ async function bootstrap() {
     origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: 'Content-Type, Authorization',
-    credentials: true,
+    credentials: false,
   });
   await app.listen(3000);
 }
