@@ -15,7 +15,7 @@ import {
   Res,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { createReadStream, existsSync, statSync } from 'fs';
+import { createReadStream, existsSync, readFileSync, statSync } from 'fs';
 import { MenuCalculatorService } from './menu-calculator.service';
 import { CreateMenuDto } from './dto/create-menu.dto';
 import { UpdateMenuDto } from './dto/update-menu.dto';
@@ -23,6 +23,7 @@ import { Menu } from './entities/menu.entity';
 import { CoreControllerV2 } from 'src/core/utils/core-controller-v2.controller';
 import { ValidationPipe } from 'src/core/pipes/validation.pipe';
 import { Public } from '../auth/jwt-auth.guard';
+import { Response } from 'express';
 @Controller('menu-calculator')
 @UsePipes(new ValidationPipe())
 export class MenuCalculatorController extends CoreControllerV2<
@@ -121,68 +122,69 @@ export class MenuCalculatorController extends CoreControllerV2<
     }
   }
 
-@Public()
-@Get('find-by-calories/:calories/pdf')
-async getPdfByCalories(
-  @Param('calories', ParseIntPipe) calories: number,
-  @Res() res: Response,
-): Promise<void> {
-  try {
-    console.log(`🔍 Buscando PDF para ${calories} calorias`);
-    
-    const menu = await this.menuCalculatorService.findByCalories(Number(calories));
+  @Public()
+  @Get('find-by-calories/:calories/pdf')
+  async getPdfByCalories(
+    @Param('calories', ParseIntPipe) calories: number,
+    @Res() res: Response,
+  ) {
+    try {
+      console.log(`🔍 Buscando PDF para ${calories} calorias`);
 
-    if (!menu || !menu.pdfUrl) {
-      return res.status(404).json({ 
-        error: 'PDF não encontrado',
-        calories 
+      const menu = await this.menuCalculatorService.findByCalories(
+        Number(calories),
+      );
+
+      if (!menu || !menu.pdfUrl) {
+        return res.status(404).json({
+          error: 'PDF não encontrado',
+          calories,
+        });
+      }
+
+      const filePath = menu.pdfUrl;
+
+      if (!existsSync(filePath)) {
+        return res.status(404).json({
+          error: 'Arquivo não encontrado no servidor',
+        });
+      }
+
+      const stats = statSync(filePath);
+      const fileName = filePath.split('/').pop() || 'menu.pdf';
+
+      console.log(`📊 Carregando arquivo: ${stats.size} bytes`);
+
+      // ABORDAGEM COM BUFFER: Carrega arquivo inteiro na memória
+      // Mais seguro para PDFs pequenos/médios (até ~50MB)
+      const fileBuffer = readFileSync(filePath);
+
+      res.set({
+        'Content-Type': 'application/pdf',
+        'Content-Length': fileBuffer.length.toString(),
+        'Content-Disposition': `inline; filename="${fileName}"`,
+        'Cache-Control': 'public, max-age=3600',
+        'X-Content-Type-Options': 'nosniff',
       });
-    }
 
-    const filePath = menu.pdfUrl;
-    
-    if (!existsSync(filePath)) {
-      return res.status(404).json({ 
-        error: 'Arquivo não encontrado no servidor' 
-      });
-    }
+      // Verificar se cliente ainda está conectado
+      if (res.destroyed || res.closed) {
+        console.log('⚠️ Cliente já desconectado, abortando envio');
+        return;
+      }
 
-    const stats = statSync(filePath);
-    const fileName = filePath.split('/').pop() || 'menu.pdf';
-    
-    console.log(`📊 Carregando arquivo: ${stats.size} bytes`);
+      console.log('📤 Enviando arquivo via buffer');
+      res.send(fileBuffer);
+      console.log('✅ Arquivo enviado com sucesso');
+    } catch (error) {
+      console.error('❌ Erro:', error);
 
-    // ABORDAGEM COM BUFFER: Carrega arquivo inteiro na memória
-    // Mais seguro para PDFs pequenos/médios (até ~50MB)
-    const fileBuffer = readFileSync(filePath);
-    
-    res.set({
-      'Content-Type': 'application/pdf',
-      'Content-Length': fileBuffer.length.toString(),
-      'Content-Disposition': `inline; filename="${fileName}"`,
-      'Cache-Control': 'public, max-age=3600',
-      'X-Content-Type-Options': 'nosniff',
-    });
-
-    // Verificar se cliente ainda está conectado
-    if (res.destroyed || res.closed) {
-      console.log('⚠️ Cliente já desconectado, abortando envio');
-      return;
-    }
-
-    console.log('📤 Enviando arquivo via buffer');
-    res.send(fileBuffer);
-    console.log('✅ Arquivo enviado com sucesso');
-
-  } catch (error) {
-    console.error('❌ Erro:', error);
-    
-    if (!res.headersSent) {
-      res.status(500).json({ 
-        error: 'Erro interno do servidor',
-        details: error.message 
-      });
+      if (!res.headersSent) {
+        res.status(500).json({
+          error: 'Erro interno do servidor',
+          details: error.message,
+        });
+      }
     }
   }
-}
 }

@@ -25,7 +25,7 @@ import { Response } from 'express';
 import { Public } from '../auth/jwt-auth.guard';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { CustomCacheInterceptor } from 'src/core/inteceptors/cache.interceptor';
-import { existsSync, statSync } from 'fs';
+import { existsSync } from 'fs';
 
 @Controller('training-sheet')
 export class TrainingSheetController extends CoreController<
@@ -145,23 +145,28 @@ export class TrainingSheetController extends CoreController<
         return;
       }
 
-      // Obter informações do arquivo
-      const stats = statSync(fullPath);
+      // Obter informações do arquivo (checado anteriormente via existsSync)
 
-      // Obter o arquivo através do serviço
-      const file = await this.service.getFile(+id);
+      // Obter o arquivo através do serviço (retorna Buffer)
+      const fileBuffer = await this.service.getFile(+id);
 
-      // Configurar headers adequados
+      // Configurar headers adequados (comportamento igual ao menu-calculator.getPdfByCalories)
       res.set({
         'Content-Type': 'application/pdf',
-        'Content-Length': stats.size.toString(),
+        'Content-Length': fileBuffer.length.toString(),
         'Content-Disposition': `attachment; filename="${fileConfig.filename}"`,
         'Cache-Control': 'no-cache, no-store, must-revalidate',
         Pragma: 'no-cache',
         Expires: '0',
       });
 
-      res.send(file);
+      // Verificar se cliente ainda está conectado
+      if ((res as any).destroyed || (res as any).closed) {
+        console.log('⚠️ Cliente já desconectado, abortando envio');
+        return;
+      }
+
+      res.send(fileBuffer);
     } catch (error) {
       console.error('Erro no getFile (training-sheet):', error);
       res.status(500).json({
