@@ -160,6 +160,8 @@ export class TrainingSheetController extends CoreController<
         Expires: '0',
       });
 
+      //.
+
       // Verificar se cliente ainda está conectado
       if ((res as any).destroyed || (res as any).closed) {
         console.log('⚠️ Cliente já desconectado, abortando envio');
