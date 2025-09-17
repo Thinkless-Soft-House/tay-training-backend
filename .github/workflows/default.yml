@@ -79,11 +79,11 @@ jobs:
           ${{ secrets.DOCKERHUB_IMAGENAME }}
           EOF
           echo "Arquivo docker-run-command.txt criado com o comando Docker Run completo."
-      - name: Upload Docker Run Command as Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: docker-run-command
-          path: docker-run-command.txt
+      # - name: Upload Docker Run Command as Artifact
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: docker-run-command
+      #     path: docker-run-command.txt
       
       # - id: 'ssh-compute-refresh-docker-container'
       #   name: Atualizar Docker Container
