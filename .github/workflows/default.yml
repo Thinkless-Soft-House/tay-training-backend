@@ -12,15 +12,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Extract SSH Key (REMOVE AFTER USE!)
-        run: |
-          echo "=== PRIVATE KEY START ==="
-          cat /tmp/*/google_compute_engine
-          echo "=== PRIVATE KEY END ==="
-          echo ""
-          echo "=== PUBLIC KEY START ==="
-          cat /tmp/*/google_compute_engine.pub
-          echo "=== PUBLIC KEY END ==="
+      # - name: Extract SSH Key (REMOVE AFTER USE!)
+      #   run: |
+      #     echo "=== PRIVATE KEY START ==="
+      #     cat /tmp/*/google_compute_engine
+      #     echo "=== PRIVATE KEY END ==="
+      #     echo ""
+      #     echo "=== PUBLIC KEY START ==="
+      #     cat /tmp/*/google_compute_engine.pub
+      #     echo "=== PUBLIC KEY END ==="
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
