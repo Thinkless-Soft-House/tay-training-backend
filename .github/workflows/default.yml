@@ -61,29 +61,30 @@ jobs:
           zone: ${{ secrets.ZONE }}
           ssh_private_key: '${{ secrets.GCP_SSH_PRIVATE_KEY }}'
           command: 'echo Hello worlddd'
-      - name: Create Docker Run Command File
-        run: |
-          cat << EOF > docker-run-command.txt
-          docker run -d \
-          --name ${{ secrets.CONTAINER_NAME }} \
-          -p 3000:3000 \
-          -v $(pwd)/app-data:/usr/src/app \
-          -v $(pwd)/files_data:/app/files \
-          -e POSTGRES_HOST=${{ secrets.POSTGRES_HOST }} \
-          -e POSTGRES_PORT=${{ secrets.POSTGRES_PORT }} \
-          -e POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
-          -e POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
-          -e POSTGRES_DB=${{ secrets.POSTGRES_DB }} \
-          -e TYPEORM_SYNC=${{ secrets.TYPEORM_SYNC }} \
-          -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
-          ${{ secrets.DOCKERHUB_IMAGENAME }}
-          EOF
-          echo "Arquivo docker-run-command.txt criado com o comando Docker Run completo."
-      # - name: Upload Docker Run Command as Artifact
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: docker-run-command
-      #     path: docker-run-command.txt
+      - id: 'create-docker-run-file'
+        name: 'Criar arquivo com comando Docker Run na máquina GCP'
+        uses: google-github-actions/ssh-compute@v1
+        with:
+          instance_name: ${{ secrets.INSTANCE_NAME }}
+          zone: ${{ secrets.ZONE }}
+          ssh_private_key: '${{ secrets.GCP_SSH_PRIVATE_KEY }}'
+          command: |
+            cat << EOF > docker-run-command.txt
+            docker run -d \
+            --name ${{ secrets.CONTAINER_NAME }} \
+            -p 3000:3000 \
+            -v \$(pwd)/app-data:/usr/src/app \
+            -v \$(pwd)/files_data:/app/files \
+            -e POSTGRES_HOST=${{ secrets.POSTGRES_HOST }} \
+            -e POSTGRES_PORT=${{ secrets.POSTGRES_PORT }} \
+            -e POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
+            -e POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
+            -e POSTGRES_DB=${{ secrets.POSTGRES_DB }} \
+            -e TYPEORM_SYNC=${{ secrets.TYPEORM_SYNC }} \
+            -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+            ${{ secrets.DOCKERHUB_IMAGENAME }}
+            EOF
+            echo "Arquivo docker-run-command.txt criado na máquina GCP com o comando Docker Run completo."
       
       # - id: 'ssh-compute-refresh-docker-container'
       #   name: Atualizar Docker Container
