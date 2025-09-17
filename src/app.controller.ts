@@ -26,4 +26,10 @@ export class AppController {
     console.log('getHello3');
     return this.appService.getHello3();
   }
+
+  @Public()
+  @Get('env')
+  getEnv(): Record<string, string | undefined> {
+    return process.env;
+  }
 }
