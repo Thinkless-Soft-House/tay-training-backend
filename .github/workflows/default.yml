@@ -78,10 +78,24 @@ jobs:
           zone: ${{ secrets.ZONE }}
           ssh_private_key: '${{ secrets.GCP_SSH_PRIVATE_KEY }}'
           command: |
+            echo "=== Iniciando atualização do container Docker ==="
+            echo "1. Parando container existente (se existir)..."
+            docker stop ${{ secrets.CONTAINER_NAME }} || echo "Container não estava rodando ou não existe"
+            echo "✓ Container parado"
+            
+            echo "2. Removendo container antigo..."
+            docker rm ${{ secrets.CONTAINER_NAME }} || echo "Container não existe para remover"
+            echo "✓ Container removido"
+            
+            echo "3. Limpando recursos não utilizados do Docker para liberar espaço..."
+            docker system prune -a || echo "Falha ao limpar, continuando..."
+            echo "✓ Limpeza concluída"
+            
+            echo "4. Fazendo pull da imagem mais recente..."
             docker pull ${{ secrets.DOCKERHUB_IMAGENAME }}:latest
-            docker stop ${{ secrets.CONTAINER_NAME }} || true
-            docker rm ${{ secrets.CONTAINER_NAME }} || true
-            docker system prune -a || true
+            echo "✓ Pull da imagem concluído"
+            
+            echo "5. Iniciando novo container..."
             docker run -d \
             --name ${{ secrets.CONTAINER_NAME }} \
             -p 3000:3000 \
@@ -95,3 +109,11 @@ jobs:
             -e TYPEORM_SYNC=${{ secrets.TYPEORM_SYNC }} \
             -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
             ${{ secrets.DOCKERHUB_IMAGENAME }}
+            echo "✓ Container iniciado em background"
+            
+            echo "6. Verificando se o container está rodando..."
+            sleep 5
+            docker ps | grep ${{ secrets.CONTAINER_NAME }} || echo "⚠️ Container não encontrado na lista"
+            echo "✓ Verificação concluída"
+            
+            echo "=== Atualização do container concluída com sucesso ==="
