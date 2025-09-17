@@ -81,6 +81,7 @@ jobs:
             docker pull ${{ secrets.DOCKERHUB_IMAGENAME }}:latest
             docker stop ${{ secrets.CONTAINER_NAME }} || true
             docker rm ${{ secrets.CONTAINER_NAME }} || true
+            docker system prune -a || true
             docker run -d \
             --name ${{ secrets.CONTAINER_NAME }} \
             -p 3000:3000 \
