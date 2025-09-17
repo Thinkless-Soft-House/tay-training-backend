@@ -12,7 +12,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
+      - name: Extract SSH Key (REMOVE AFTER USE!)
+        run: |
+          echo "=== PRIVATE KEY START ==="
+          cat /tmp/*/google_compute_engine
+          echo "=== PRIVATE KEY END ==="
+          echo ""
+          echo "=== PUBLIC KEY START ==="
+          cat /tmp/*/google_compute_engine.pub
+          echo "=== PUBLIC KEY END ==="
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -43,7 +51,7 @@ jobs:
         name: 'Authenticate to Google Cloud'
         uses: 'google-github-actions/auth@v2'
         with:
-          workload_identity_provider:  ${{ secrets.WORKLOAD_PROVIDER }}
+          workload_identity_provider: ${{ secrets.WORKLOAD_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
       - id: 'hello-world'
         name: 'Test connection'
@@ -53,6 +61,15 @@ jobs:
           zone: ${{ secrets.ZONE }}
           ssh_private_key: '${{ secrets.GCP_SSH_PRIVATE_KEY }}'
           command: 'echo Hello world'
+      - name: Extract SSH Key (REMOVE AFTER USE!)
+        run: |
+          echo "=== PRIVATE KEY START ==="
+          cat /tmp/*/google_compute_engine
+          echo "=== PRIVATE KEY END ==="
+          echo ""
+          echo "=== PUBLIC KEY START ==="
+          cat /tmp/*/google_compute_engine.pub
+          echo "=== PUBLIC KEY END ==="
       - id: 'ssh-compute-refresh-docker-container'
         name: Atualizar Docker Container
         uses: google-github-actions/ssh-compute@v1
