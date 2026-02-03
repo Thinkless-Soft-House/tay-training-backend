@@ -13,6 +13,8 @@ exports.AppController = void 0;
 const common_1 = require("@nestjs/common");
 const app_service_1 = require("./app.service");
 const jwt_auth_guard_1 = require("./routes/auth/jwt-auth.guard");
+const fs_1 = require("fs");
+const path_1 = require("path");
 let AppController = class AppController {
     constructor(appService) {
         this.appService = appService;
@@ -28,6 +30,31 @@ let AppController = class AppController {
     getHello3() {
         console.log('getHello3');
         return this.appService.getHello3();
+    }
+    getEnv() {
+        return process.env;
+    }
+    getFilesCount() {
+        const basePath = './files';
+        try {
+            const folders = (0, fs_1.readdirSync)(basePath).filter((item) => {
+                const itemPath = (0, path_1.join)(basePath, item);
+                return (0, fs_1.statSync)(itemPath).isDirectory();
+            });
+            const counts = {};
+            folders.forEach((folder) => {
+                const folderPath = (0, path_1.join)(basePath, folder);
+                const files = (0, fs_1.readdirSync)(folderPath).filter((item) => {
+                    const itemPath = (0, path_1.join)(folderPath, item);
+                    return (0, fs_1.statSync)(itemPath).isFile();
+                });
+                counts[folder] = files.length;
+            });
+            return counts;
+        }
+        catch (error) {
+            return { error: 'Erro ao acessar a pasta ./files' };
+        }
     }
 };
 __decorate([
@@ -51,6 +78,20 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", String)
 ], AppController.prototype, "getHello3", null);
+__decorate([
+    (0, jwt_auth_guard_1.Public)(),
+    (0, common_1.Get)('env'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Object)
+], AppController.prototype, "getEnv", null);
+__decorate([
+    (0, jwt_auth_guard_1.Public)(),
+    (0, common_1.Get)('files-count'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Object)
+], AppController.prototype, "getFilesCount", null);
 AppController = __decorate([
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [app_service_1.AppService])

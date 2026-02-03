@@ -212,4 +212,24 @@ export class TrainingSheetController extends CoreController<
     }
     return await this.service.getWorkoutDetail(slug, week, workoutIndex);
   }
+
+  @Public()
+  @Get('test/slug-report')
+  async generateSlugReport() {
+    try {
+      const filePath = await this.trainingSheetService.generateSlugReport();
+      return {
+        success: true,
+        message: 'Relatório de slugs gerado com sucesso',
+        filePath: filePath,
+        info: 'O arquivo foi salvo no servidor no caminho indicado',
+      };
+    } catch (error) {
+      throw new ErrorHandler(
+        error.message,
+        error.response?.errorCode || 500,
+        error.response?.statusCode || 500,
+      );
+    }
+  }
 }

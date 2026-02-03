@@ -9,6 +9,7 @@ import { translateTypeORMError } from 'src/core/functions/typeorm.utils';
 import { MulterFile } from 'multer';
 import { FileService } from 'src/core/services/File.service';
 import { ErrorHandler } from 'src/core/handlers/error.handler';
+import { writeFileSync, mkdirSync, existsSync } from 'fs';
 
 export interface WeekData {
   id: number;
@@ -344,5 +345,69 @@ export class TrainingSheetService extends CoreService<TrainingSheet> {
         exerciseMethods: exerciseGroup.exerciseMethods,
       },
     };
+  }
+
+  async generateSlugReport(): Promise<string> {
+    try {
+      // Buscar todos os training sheets
+      const allSheets = await this.repository.find({
+        select: ['id', 'name', 'slug'],
+        order: { id: 'ASC' },
+      });
+
+      // Gerar o relatório
+      const report = allSheets.map((sheet) => {
+        // Limpar o nome (remover espaços/tabs extras no início e fim)
+        const cleanName = sheet.name?.trim() || '';
+
+        // Gerar o slug esperado da mesma forma que o método create() faz
+        const expectedSlug = slugify(`${sheet.id}-${cleanName}`, {
+          lower: true,
+        });
+
+        const isAligned = sheet.slug === expectedSlug;
+
+        return {
+          id: sheet.id,
+          name: sheet.name, // Mantém o nome original para visualização
+          cleanName: cleanName, // Mostra o nome limpo
+          currentSlug: sheet.slug,
+          expectedSlug: expectedSlug,
+          isAligned: isAligned,
+          needsUpdate: !isAligned,
+        };
+      });
+
+      // Estatísticas
+      const stats = {
+        total: report.length,
+        aligned: report.filter((r) => r.isAligned).length,
+        misaligned: report.filter((r) => !r.isAligned).length,
+      };
+
+      const finalReport = {
+        generatedAt: new Date().toISOString(),
+        statistics: stats,
+        items: report,
+      };
+
+      // Garantir que o diretório existe
+      const dirPath = './files/reports';
+      if (!existsSync(dirPath)) {
+        mkdirSync(dirPath, { recursive: true });
+      }
+
+      // Salvar o relatório em arquivo
+      const filePath = `${dirPath}/slug-report.json`;
+      writeFileSync(filePath, JSON.stringify(finalReport, null, 2), 'utf-8');
+
+      return filePath;
+    } catch (error) {
+      throw new ErrorHandler(
+        'Erro ao gerar relatório de slugs: ' + error.message,
+        500,
+        500,
+      );
+    }
   }
 }

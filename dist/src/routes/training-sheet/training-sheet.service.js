@@ -22,6 +22,7 @@ const slugify_1 = require("slugify");
 const typeorm_utils_1 = require("../../core/functions/typeorm.utils");
 const File_service_1 = require("../../core/services/File.service");
 const error_handler_1 = require("../../core/handlers/error.handler");
+const fs_1 = require("fs");
 let TrainingSheetService = class TrainingSheetService extends core_service_service_1.CoreService {
     constructor(trainingSheetRepository, fileService) {
         super(trainingSheetRepository);
@@ -231,6 +232,51 @@ let TrainingSheetService = class TrainingSheetService extends core_service_servi
                 exerciseMethods: exerciseGroup.exerciseMethods,
             },
         };
+    }
+    async generateSlugReport() {
+        try {
+            const allSheets = await this.repository.find({
+                select: ['id', 'name', 'slug'],
+                order: { id: 'ASC' },
+            });
+            const report = allSheets.map((sheet) => {
+                var _a;
+                const cleanName = ((_a = sheet.name) === null || _a === void 0 ? void 0 : _a.trim()) || '';
+                const expectedSlug = (0, slugify_1.default)(`${sheet.id}-${cleanName}`, {
+                    lower: true,
+                });
+                const isAligned = sheet.slug === expectedSlug;
+                return {
+                    id: sheet.id,
+                    name: sheet.name,
+                    cleanName: cleanName,
+                    currentSlug: sheet.slug,
+                    expectedSlug: expectedSlug,
+                    isAligned: isAligned,
+                    needsUpdate: !isAligned,
+                };
+            });
+            const stats = {
+                total: report.length,
+                aligned: report.filter((r) => r.isAligned).length,
+                misaligned: report.filter((r) => !r.isAligned).length,
+            };
+            const finalReport = {
+                generatedAt: new Date().toISOString(),
+                statistics: stats,
+                items: report,
+            };
+            const dirPath = './files/reports';
+            if (!(0, fs_1.existsSync)(dirPath)) {
+                (0, fs_1.mkdirSync)(dirPath, { recursive: true });
+            }
+            const filePath = `${dirPath}/slug-report.json`;
+            (0, fs_1.writeFileSync)(filePath, JSON.stringify(finalReport, null, 2), 'utf-8');
+            return filePath;
+        }
+        catch (error) {
+            throw new error_handler_1.ErrorHandler('Erro ao gerar relatório de slugs: ' + error.message, 500, 500);
+        }
     }
 };
 TrainingSheetService = __decorate([

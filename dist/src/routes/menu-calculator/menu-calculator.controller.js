@@ -39,29 +39,82 @@ let MenuCalculatorController = class MenuCalculatorController extends core_contr
         return this.menuCalculatorService.updateWithFile(+id, updateDto, (_a = file === null || file === void 0 ? void 0 : file.file) === null || _a === void 0 ? void 0 : _a[0]);
     }
     async getFile(id, res) {
-        const filePath = await this.menuCalculatorService.getFilePath(+id);
-        const fileName = filePath.split('/').pop() || 'arquivo.pdf';
-        res.set({
-            'Content-Type': 'application/pdf',
-            'Content-Disposition': `attachment; filename="${fileName}"`,
-        });
-        const fileStream = (0, fs_1.createReadStream)(filePath);
-        return new common_1.StreamableFile(fileStream);
+        try {
+            const filePath = await this.menuCalculatorService.getFilePath(+id);
+            if (!(0, fs_1.existsSync)(filePath)) {
+                res.status(404).send('Arquivo não encontrado');
+                return;
+            }
+            const stats = (0, fs_1.statSync)(filePath);
+            const fileName = filePath.split('/').pop() || 'arquivo.pdf';
+            res.set({
+                'Content-Type': 'application/pdf',
+                'Content-Length': stats.size.toString(),
+                'Content-Disposition': `attachment; filename="${fileName}"`,
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                Pragma: 'no-cache',
+                Expires: '0',
+            });
+            const fileStream = (0, fs_1.createReadStream)(filePath);
+            fileStream.on('error', (error) => {
+                console.error('Erro ao ler arquivo:', error);
+                if (!res.headersSent) {
+                    res.status(500).send('Erro interno do servidor');
+                }
+            });
+            return new common_1.StreamableFile(fileStream);
+        }
+        catch (error) {
+            console.error('Erro no getFile:', error);
+            if (!res.headersSent) {
+                res.status(500).send('Erro interno do servidor');
+            }
+        }
     }
     async getPdfByCalories(calories, res) {
-        const menu = await this.menuCalculatorService.findByCalories(Number(calories));
-        if (!menu || !menu.pdfUrl) {
-            res.status(404).send('PDF não encontrado para este menu');
-            return;
+        try {
+            console.log(`🔍 Buscando PDF para ${calories} calorias`);
+            const menu = await this.menuCalculatorService.findByCalories(Number(calories));
+            if (!menu || !menu.pdfUrl) {
+                return res.status(404).json({
+                    error: 'PDF não encontrado',
+                    calories,
+                });
+            }
+            const filePath = menu.pdfUrl;
+            if (!(0, fs_1.existsSync)(filePath)) {
+                return res.status(404).json({
+                    error: 'Arquivo não encontrado no servidor',
+                });
+            }
+            const stats = (0, fs_1.statSync)(filePath);
+            const fileName = filePath.split('/').pop() || 'menu.pdf';
+            console.log(`📊 Carregando arquivo: ${stats.size} bytes`);
+            const fileBuffer = (0, fs_1.readFileSync)(filePath);
+            res.set({
+                'Content-Type': 'application/pdf',
+                'Content-Length': fileBuffer.length.toString(),
+                'Content-Disposition': `inline; filename="${fileName}"`,
+                'Cache-Control': 'public, max-age=3600',
+                'X-Content-Type-Options': 'nosniff',
+            });
+            if (res.destroyed || res.closed) {
+                console.log('⚠️ Cliente já desconectado, abortando envio');
+                return;
+            }
+            console.log('📤 Enviando arquivo via buffer');
+            res.send(fileBuffer);
+            console.log('✅ Arquivo enviado com sucesso');
         }
-        const filePath = menu.pdfUrl;
-        const fileName = filePath.split('/').pop() || 'arquivo.pdf';
-        res.set({
-            'Content-Type': 'application/pdf',
-            'Content-Disposition': `attachment; filename="${fileName}"`,
-        });
-        const fileStream = (0, fs_1.createReadStream)(filePath);
-        return new common_1.StreamableFile(fileStream);
+        catch (error) {
+            console.error('❌ Erro:', error);
+            if (!res.headersSent) {
+                res.status(500).json({
+                    error: 'Erro interno do servidor',
+                    details: error.message,
+                });
+            }
+        }
     }
 };
 __decorate([
@@ -104,7 +157,7 @@ __decorate([
     (0, jwt_auth_guard_1.Public)(),
     (0, common_1.Get)('find-by-calories/:calories/pdf'),
     __param(0, (0, common_1.Param)('calories', common_1.ParseIntPipe)),
-    __param(1, (0, common_1.Res)({ passthrough: true })),
+    __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)

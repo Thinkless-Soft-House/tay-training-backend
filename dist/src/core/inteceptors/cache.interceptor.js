@@ -30,6 +30,8 @@ let CustomCacheInterceptor = class CustomCacheInterceptor {
     }
     async intercept(context, next) {
         var _a, _b;
+        console.log('🚫 Cache desabilitado - executando sem cache');
+        return next.handle();
         const key = this.trackBy(context);
         const ttlValueOrFactory = (_b = (_a = this.reflector.get(common_1.CACHE_TTL_METADATA, context.getHandler())) !== null && _a !== void 0 ? _a : this.reflector.get(common_1.CACHE_TTL_METADATA, context.getClass())) !== null && _b !== void 0 ? _b : null;
         if (!key) {

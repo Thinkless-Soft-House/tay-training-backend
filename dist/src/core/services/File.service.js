@@ -23,14 +23,16 @@ let FileService = class FileService {
     }
     async getFile(route, name) {
         const fullPath = path.join(route, name);
-        if (fs.existsSync(fullPath)) {
+        if (!fs.existsSync(fullPath)) {
+            throw new Error(`Arquivo não encontrado: ${fullPath}`);
+        }
+        try {
             const fileBuffer = fs.readFileSync(fullPath);
             return fileBuffer;
         }
-        else {
-            throw new Error('Arquivo não encontrado');
+        catch (error) {
+            throw new Error(`Erro ao ler arquivo: ${error.message}`);
         }
-        return;
     }
 };
 FileService = __decorate([

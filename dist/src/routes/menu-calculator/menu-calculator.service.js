@@ -13,6 +13,8 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MenuCalculatorService = void 0;
+const fs = require("fs");
+const path = require("path");
 const File_service_1 = require("../../core/services/File.service");
 const error_handler_1 = require("../../core/handlers/error.handler");
 const common_1 = require("@nestjs/common");
@@ -79,17 +81,20 @@ let MenuCalculatorService = class MenuCalculatorService extends core_service_ser
         return where;
     }
     async findByCalories(calories) {
-        const menu = await this.menuRepository.createQueryBuilder('menu')
+        const menu = await this.menuRepository
+            .createQueryBuilder('menu')
             .where('menu.minCalories <= :mincalories', { mincalories: calories })
             .andWhere('menu.maxCalories >= :maxcalories', { maxcalories: calories })
             .orderBy('menu.minCalories', 'ASC')
             .getOne();
         if (!menu) {
-            const minprox = await this.menuRepository.createQueryBuilder('menu')
+            const minprox = await this.menuRepository
+                .createQueryBuilder('menu')
                 .where('menu.minCalories <= :mincalories', { mincalories: calories })
                 .orderBy('menu.minCalories', 'DESC')
                 .getOne();
-            const maxprox = await this.menuRepository.createQueryBuilder('menu')
+            const maxprox = await this.menuRepository
+                .createQueryBuilder('menu')
                 .where('menu.maxCalories >= :maxcalories', { maxcalories: calories })
                 .orderBy('menu.maxCalories', 'ASC')
                 .getOne();
@@ -129,9 +134,13 @@ let MenuCalculatorService = class MenuCalculatorService extends core_service_ser
                     .replace(/_+/g, '_')
                     .replace(/^_+|_+$/g, '');
                 const fileName = `menu_${safeName}.pdf`;
-                const filePath = './files/menus/';
-                await this.fileService.createFile(filePath, fileName, file.buffer);
-                pdfUrl = `${filePath}${fileName}`;
+                const fileDir = path.resolve(process.cwd(), 'files/menus');
+                if (!fs.existsSync(fileDir)) {
+                    fs.mkdirSync(fileDir, { recursive: true });
+                }
+                const fullFilePath = path.join(fileDir, fileName);
+                await this.fileService.createFile(fileDir + '/', fileName, file.buffer);
+                pdfUrl = `./files/menus/${fileName}`;
             }
             const newItem = this.menuRepository.create(Object.assign(Object.assign({}, createDto), { pdfUrl }));
             const created = await this.menuRepository.save(newItem);
@@ -154,9 +163,13 @@ let MenuCalculatorService = class MenuCalculatorService extends core_service_ser
                     .replace(/_+/g, '_')
                     .replace(/^_+|_+$/g, '');
                 const fileName = `menu_${safeName}.pdf`;
-                const filePath = './files/menus/';
-                await this.fileService.createFile(filePath, fileName, file.buffer);
-                pdfUrl = `${filePath}${fileName}`;
+                const fileDir = path.resolve(process.cwd(), 'files/menus');
+                if (!fs.existsSync(fileDir)) {
+                    fs.mkdirSync(fileDir, { recursive: true });
+                }
+                const fullFilePath = path.join(fileDir, fileName);
+                await this.fileService.createFile(fileDir + '/', fileName, file.buffer);
+                pdfUrl = `./files/menus/${fileName}`;
             }
             const dto = Object.assign(Object.assign(Object.assign({}, item), updateDto), { pdfUrl });
             await this.menuRepository.update(id, dto);
@@ -170,7 +183,28 @@ let MenuCalculatorService = class MenuCalculatorService extends core_service_ser
         const item = await this.menuRepository.findOne({ where: { id } });
         if (!item || !item.pdfUrl)
             throw new error_handler_1.ErrorHandler('Arquivo não encontrado', 404, 404);
+        if (!fs.existsSync(item.pdfUrl)) {
+            throw new error_handler_1.ErrorHandler('Arquivo não encontrado no servidor', 404, 404);
+        }
         return item.pdfUrl;
+    }
+    async getFileInfo(id) {
+        try {
+            const item = await this.menuRepository.findOne({ where: { id } });
+            if (!item || !item.pdfUrl) {
+                return { path: '', size: 0, exists: false };
+            }
+            const filePath = item.pdfUrl;
+            const exists = fs.existsSync(filePath);
+            if (!exists) {
+                return { path: filePath, size: 0, exists: false };
+            }
+            const stats = fs.statSync(filePath);
+            return { path: filePath, size: stats.size, exists: true };
+        }
+        catch (error) {
+            return { path: '', size: 0, exists: false };
+        }
     }
 };
 MenuCalculatorService = __decorate([

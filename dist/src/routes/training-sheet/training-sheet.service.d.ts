@@ -49,4 +49,5 @@ export declare class TrainingSheetService extends CoreService<TrainingSheet> {
             exerciseMethods: import("../exercise-method/entities/exercise-method.entity").ExerciseMethod[];
         };
     }>;
+    generateSlugReport(): Promise<string>;
 }

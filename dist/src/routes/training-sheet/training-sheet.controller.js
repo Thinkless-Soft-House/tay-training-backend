@@ -20,7 +20,7 @@ const error_handler_1 = require("../../core/handlers/error.handler");
 const platform_express_1 = require("@nestjs/platform-express");
 const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
 const cache_manager_1 = require("@nestjs/cache-manager");
-const cache_interceptor_1 = require("../../core/inteceptors/cache.interceptor");
+const fs_1 = require("fs");
 let TrainingSheetController = class TrainingSheetController extends core_controller_controller_1.CoreController {
     constructor(trainingSheetService) {
         super(trainingSheetService);
@@ -59,14 +59,42 @@ let TrainingSheetController = class TrainingSheetController extends core_control
         }
     }
     async getFile(id, res) {
-        var _a, _b;
         try {
-            const file = await this.service.getFile(+id);
-            res.set('Content-Type', 'application/pdf');
-            res.send(file);
+            const trainingSheet = await this.service.findOne(+id);
+            if (!trainingSheet) {
+                res.status(404).json({ error: 'Treino não encontrado' });
+                return;
+            }
+            const fileConfig = {
+                filename: 'Treino_' + id + '.pdf',
+                path: './files/workouts/',
+            };
+            const fullPath = `${fileConfig.path}${fileConfig.filename}`;
+            if (!(0, fs_1.existsSync)(fullPath)) {
+                res.status(404).json({ error: 'Arquivo não encontrado no servidor' });
+                return;
+            }
+            const fileBuffer = await this.service.getFile(+id);
+            res.set({
+                'Content-Type': 'application/pdf',
+                'Content-Length': fileBuffer.length.toString(),
+                'Content-Disposition': `attachment; filename="${fileConfig.filename}"`,
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                Pragma: 'no-cache',
+                Expires: '0',
+            });
+            if (res.destroyed || res.closed) {
+                console.log('⚠️ Cliente já desconectado, abortando envio');
+                return;
+            }
+            res.send(fileBuffer);
         }
         catch (error) {
-            throw new error_handler_1.ErrorHandler(error.message, ((_a = error.response) === null || _a === void 0 ? void 0 : _a.errorCode) || 400, ((_b = error.response) === null || _b === void 0 ? void 0 : _b.statusCode) || 400);
+            console.error('Erro no getFile (training-sheet):', error);
+            res.status(500).json({
+                error: 'Erro interno do servidor',
+                details: error.message,
+            });
         }
     }
     async getPlannerHome(slug) {
@@ -84,6 +112,21 @@ let TrainingSheetController = class TrainingSheetController extends core_control
             throw new common_1.NotFoundException('Semana inválida');
         }
         return await this.service.getWorkoutDetail(slug, week, workoutIndex);
+    }
+    async generateSlugReport() {
+        var _a, _b;
+        try {
+            const filePath = await this.trainingSheetService.generateSlugReport();
+            return {
+                success: true,
+                message: 'Relatório de slugs gerado com sucesso',
+                filePath: filePath,
+                info: 'O arquivo foi salvo no servidor no caminho indicado',
+            };
+        }
+        catch (error) {
+            throw new error_handler_1.ErrorHandler(error.message, ((_a = error.response) === null || _a === void 0 ? void 0 : _a.errorCode) || 500, ((_b = error.response) === null || _b === void 0 ? void 0 : _b.statusCode) || 500);
+        }
     }
 };
 __decorate([
@@ -116,7 +159,6 @@ __decorate([
 ], TrainingSheetController.prototype, "getFile", null);
 __decorate([
     (0, jwt_auth_guard_1.Public)(),
-    (0, common_1.UseInterceptors)(cache_interceptor_1.CustomCacheInterceptor),
     (0, cache_manager_1.CacheTTL)(10 * 60 * 1000),
     (0, common_1.Get)('planner-home/:slug'),
     __param(0, (0, common_1.Param)('slug')),
@@ -126,7 +168,6 @@ __decorate([
 ], TrainingSheetController.prototype, "getPlannerHome", null);
 __decorate([
     (0, jwt_auth_guard_1.Public)(),
-    (0, common_1.UseInterceptors)(cache_interceptor_1.CustomCacheInterceptor),
     (0, cache_manager_1.CacheTTL)(10 * 60 * 1000),
     (0, common_1.Get)('week/:slug/:week'),
     __param(0, (0, common_1.Param)('slug')),
@@ -137,7 +178,6 @@ __decorate([
 ], TrainingSheetController.prototype, "getWeekData", null);
 __decorate([
     (0, jwt_auth_guard_1.Public)(),
-    (0, common_1.UseInterceptors)(cache_interceptor_1.CustomCacheInterceptor),
     (0, common_1.Get)('workout-detail/:slug/:week/:workout'),
     (0, cache_manager_1.CacheTTL)(10 * 60 * 1000),
     __param(0, (0, common_1.Param)('slug')),
@@ -147,6 +187,13 @@ __decorate([
     __metadata("design:paramtypes", [String, Number, Number]),
     __metadata("design:returntype", Promise)
 ], TrainingSheetController.prototype, "getWorkoutDetail", null);
+__decorate([
+    (0, jwt_auth_guard_1.Public)(),
+    (0, common_1.Get)('test/slug-report'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], TrainingSheetController.prototype, "generateSlugReport", null);
 TrainingSheetController = __decorate([
     (0, common_1.Controller)('training-sheet'),
     __metadata("design:paramtypes", [training_sheet_service_1.TrainingSheetService])

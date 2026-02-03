@@ -10,13 +10,13 @@ exports.AppService = void 0;
 const common_1 = require("@nestjs/common");
 let AppService = class AppService {
     getHello() {
-        return 'Hello World!';
+        return 'Hello Taytraining version 2.1!';
     }
     getHello2() {
-        return 'Hello World 2!';
+        return 'Hello Taytraining 2!';
     }
     getHello3() {
-        return 'Hello World 3!';
+        return 'Hello Taytraining 3!';
     }
 };
 AppService = __decorate([

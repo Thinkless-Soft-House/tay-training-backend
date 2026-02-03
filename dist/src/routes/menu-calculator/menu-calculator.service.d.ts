@@ -12,4 +12,9 @@ export declare class MenuCalculatorService extends CoreService<Menu> {
     createWithFile(createDto: any, file: any): Promise<Menu[]>;
     updateWithFile(id: number, updateDto: any, file: any): Promise<Menu>;
     getFilePath(id: number): Promise<string>;
+    getFileInfo(id: number): Promise<{
+        path: string;
+        size: number;
+        exists: boolean;
+    }>;
 }

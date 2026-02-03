@@ -33,4 +33,10 @@ export declare class TrainingSheetController extends CoreController<TrainingShee
             exerciseMethods: import("../exercise-method/entities/exercise-method.entity").ExerciseMethod[];
         };
     }>;
+    generateSlugReport(): Promise<{
+        success: boolean;
+        message: string;
+        filePath: string;
+        info: string;
+    }>;
 }

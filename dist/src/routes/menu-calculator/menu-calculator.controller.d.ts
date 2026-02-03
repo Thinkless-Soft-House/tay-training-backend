@@ -4,6 +4,7 @@ import { CreateMenuDto } from './dto/create-menu.dto';
 import { UpdateMenuDto } from './dto/update-menu.dto';
 import { Menu } from './entities/menu.entity';
 import { CoreControllerV2 } from 'src/core/utils/core-controller-v2.controller';
+import { Response } from 'express';
 export declare class MenuCalculatorController extends CoreControllerV2<Menu, MenuCalculatorService, CreateMenuDto, UpdateMenuDto> {
     private readonly menuCalculatorService;
     constructor(menuCalculatorService: MenuCalculatorService);
@@ -15,5 +16,5 @@ export declare class MenuCalculatorController extends CoreControllerV2<Menu, Men
         file?: any[];
     }): Promise<Menu>;
     getFile(id: string, res: any): Promise<StreamableFile>;
-    getPdfByCalories(calories: number, res: any): Promise<StreamableFile | void>;
+    getPdfByCalories(calories: number, res: Response): Promise<Response<any, Record<string, any>>>;
 }
