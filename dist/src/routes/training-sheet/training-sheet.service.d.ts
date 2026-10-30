@@ -27,6 +27,7 @@ export declare class TrainingSheetService extends CoreService<TrainingSheet> {
     private fileService;
     constructor(trainingSheetRepository: Repository<TrainingSheet>, fileService: FileService);
     getFile(id: number): Promise<Buffer>;
+    hasFile(id: number): Promise<boolean>;
     createWhere(query: any): {};
     create(createDto: any): Promise<TrainingSheet>;
     createWithFile(createDto: any, file: MulterFile): Promise<TrainingSheet>;

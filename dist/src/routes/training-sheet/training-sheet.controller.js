@@ -20,7 +20,6 @@ const error_handler_1 = require("../../core/handlers/error.handler");
 const platform_express_1 = require("@nestjs/platform-express");
 const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
 const cache_manager_1 = require("@nestjs/cache-manager");
-const fs_1 = require("fs");
 let TrainingSheetController = class TrainingSheetController extends core_controller_controller_1.CoreController {
     constructor(trainingSheetService) {
         super(trainingSheetService);
@@ -70,7 +69,7 @@ let TrainingSheetController = class TrainingSheetController extends core_control
                 path: './files/workouts/',
             };
             const fullPath = `${fileConfig.path}${fileConfig.filename}`;
-            if (!(0, fs_1.existsSync)(fullPath)) {
+            if (!(await this.service.hasFile(+id))) {
                 res.status(404).json({ error: 'Arquivo não encontrado no servidor' });
                 return;
             }

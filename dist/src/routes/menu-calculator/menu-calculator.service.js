@@ -13,7 +13,6 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MenuCalculatorService = void 0;
-const fs = require("fs");
 const path = require("path");
 const File_service_1 = require("../../core/services/File.service");
 const error_handler_1 = require("../../core/handlers/error.handler");
@@ -135,10 +134,6 @@ let MenuCalculatorService = class MenuCalculatorService extends core_service_ser
                     .replace(/^_+|_+$/g, '');
                 const fileName = `menu_${safeName}.pdf`;
                 const fileDir = path.resolve(process.cwd(), 'files/menus');
-                if (!fs.existsSync(fileDir)) {
-                    fs.mkdirSync(fileDir, { recursive: true });
-                }
-                const fullFilePath = path.join(fileDir, fileName);
                 await this.fileService.createFile(fileDir + '/', fileName, file.buffer);
                 pdfUrl = `./files/menus/${fileName}`;
             }
@@ -164,10 +159,6 @@ let MenuCalculatorService = class MenuCalculatorService extends core_service_ser
                     .replace(/^_+|_+$/g, '');
                 const fileName = `menu_${safeName}.pdf`;
                 const fileDir = path.resolve(process.cwd(), 'files/menus');
-                if (!fs.existsSync(fileDir)) {
-                    fs.mkdirSync(fileDir, { recursive: true });
-                }
-                const fullFilePath = path.join(fileDir, fileName);
                 await this.fileService.createFile(fileDir + '/', fileName, file.buffer);
                 pdfUrl = `./files/menus/${fileName}`;
             }
@@ -183,7 +174,7 @@ let MenuCalculatorService = class MenuCalculatorService extends core_service_ser
         const item = await this.menuRepository.findOne({ where: { id } });
         if (!item || !item.pdfUrl)
             throw new error_handler_1.ErrorHandler('Arquivo não encontrado', 404, 404);
-        if (!fs.existsSync(item.pdfUrl)) {
+        if (!(await this.fileService.exists(item.pdfUrl))) {
             throw new error_handler_1.ErrorHandler('Arquivo não encontrado no servidor', 404, 404);
         }
         return item.pdfUrl;
@@ -195,16 +186,21 @@ let MenuCalculatorService = class MenuCalculatorService extends core_service_ser
                 return { path: '', size: 0, exists: false };
             }
             const filePath = item.pdfUrl;
-            const exists = fs.existsSync(filePath);
-            if (!exists) {
+            const size = await this.fileService.getSize(filePath);
+            if (size === null) {
                 return { path: filePath, size: 0, exists: false };
             }
-            const stats = fs.statSync(filePath);
-            return { path: filePath, size: stats.size, exists: true };
+            return { path: filePath, size, exists: true };
         }
         catch (error) {
             return { path: '', size: 0, exists: false };
         }
+    }
+    async fileExists(filePath) {
+        return this.fileService.exists(filePath);
+    }
+    async readFile(filePath) {
+        return this.fileService.getFileByPath(filePath);
     }
 };
 MenuCalculatorService = __decorate([

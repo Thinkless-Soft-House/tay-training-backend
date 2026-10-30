@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { FileService } from 'src/core/services/File.service';
 import { Menu } from './entities/menu.entity';
 import { Repository } from 'typeorm';
@@ -17,4 +18,6 @@ export declare class MenuCalculatorService extends CoreService<Menu> {
         size: number;
         exists: boolean;
     }>;
+    fileExists(filePath: string): Promise<boolean>;
+    readFile(filePath: string): Promise<Buffer>;
 }

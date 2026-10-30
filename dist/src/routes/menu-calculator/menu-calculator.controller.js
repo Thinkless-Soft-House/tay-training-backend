@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MenuCalculatorController = void 0;
 const common_1 = require("@nestjs/common");
 const platform_express_1 = require("@nestjs/platform-express");
-const fs_1 = require("fs");
 const menu_calculator_service_1 = require("./menu-calculator.service");
 const create_menu_dto_1 = require("./dto/create-menu.dto");
 const update_menu_dto_1 = require("./dto/update-menu.dto");
@@ -41,28 +40,17 @@ let MenuCalculatorController = class MenuCalculatorController extends core_contr
     async getFile(id, res) {
         try {
             const filePath = await this.menuCalculatorService.getFilePath(+id);
-            if (!(0, fs_1.existsSync)(filePath)) {
-                res.status(404).send('Arquivo não encontrado');
-                return;
-            }
-            const stats = (0, fs_1.statSync)(filePath);
+            const fileBuffer = await this.menuCalculatorService.readFile(filePath);
             const fileName = filePath.split('/').pop() || 'arquivo.pdf';
             res.set({
                 'Content-Type': 'application/pdf',
-                'Content-Length': stats.size.toString(),
+                'Content-Length': fileBuffer.length.toString(),
                 'Content-Disposition': `attachment; filename="${fileName}"`,
                 'Cache-Control': 'no-cache, no-store, must-revalidate',
                 Pragma: 'no-cache',
                 Expires: '0',
             });
-            const fileStream = (0, fs_1.createReadStream)(filePath);
-            fileStream.on('error', (error) => {
-                console.error('Erro ao ler arquivo:', error);
-                if (!res.headersSent) {
-                    res.status(500).send('Erro interno do servidor');
-                }
-            });
-            return new common_1.StreamableFile(fileStream);
+            return new common_1.StreamableFile(fileBuffer);
         }
         catch (error) {
             console.error('Erro no getFile:', error);
@@ -82,15 +70,14 @@ let MenuCalculatorController = class MenuCalculatorController extends core_contr
                 });
             }
             const filePath = menu.pdfUrl;
-            if (!(0, fs_1.existsSync)(filePath)) {
+            if (!(await this.menuCalculatorService.fileExists(filePath))) {
                 return res.status(404).json({
                     error: 'Arquivo não encontrado no servidor',
                 });
             }
-            const stats = (0, fs_1.statSync)(filePath);
             const fileName = filePath.split('/').pop() || 'menu.pdf';
-            console.log(`📊 Carregando arquivo: ${stats.size} bytes`);
-            const fileBuffer = (0, fs_1.readFileSync)(filePath);
+            const fileBuffer = await this.menuCalculatorService.readFile(filePath);
+            console.log(`📊 Carregando arquivo: ${fileBuffer.length} bytes`);
             res.set({
                 'Content-Type': 'application/pdf',
                 'Content-Length': fileBuffer.length.toString(),

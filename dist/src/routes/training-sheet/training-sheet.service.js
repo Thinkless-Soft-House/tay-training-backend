@@ -43,6 +43,9 @@ let TrainingSheetService = class TrainingSheetService extends core_service_servi
         const buffer = await this.fileService.getFile(fileConfig.path, fileConfig.filename);
         return buffer;
     }
+    async hasFile(id) {
+        return this.fileService.exists(`./files/workouts/Treino_${id}.pdf`);
+    }
     createWhere(query) {
         const where = {};
         if (query.name)

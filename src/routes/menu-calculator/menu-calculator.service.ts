@@ -1,4 +1,3 @@
-import * as fs from 'fs';
 import * as path from 'path';
 import { FileService } from 'src/core/services/File.service';
 import { ErrorHandler } from 'src/core/handlers/error.handler';
@@ -144,10 +143,6 @@ export class MenuCalculatorService extends CoreService<Menu> {
           .replace(/^_+|_+$/g, '');
         const fileName = `menu_${safeName}.pdf`;
         const fileDir = path.resolve(process.cwd(), 'files/menus');
-        if (!fs.existsSync(fileDir)) {
-          fs.mkdirSync(fileDir, { recursive: true });
-        }
-        const fullFilePath = path.join(fileDir, fileName);
         await this.fileService.createFile(fileDir + '/', fileName, file.buffer);
         pdfUrl = `./files/menus/${fileName}`;
       }
@@ -173,10 +168,6 @@ export class MenuCalculatorService extends CoreService<Menu> {
           .replace(/^_+|_+$/g, '');
         const fileName = `menu_${safeName}.pdf`;
         const fileDir = path.resolve(process.cwd(), 'files/menus');
-        if (!fs.existsSync(fileDir)) {
-          fs.mkdirSync(fileDir, { recursive: true });
-        }
-        const fullFilePath = path.join(fileDir, fileName);
         await this.fileService.createFile(fileDir + '/', fileName, file.buffer);
         pdfUrl = `./files/menus/${fileName}`;
       }
@@ -193,8 +184,8 @@ export class MenuCalculatorService extends CoreService<Menu> {
     if (!item || !item.pdfUrl)
       throw new ErrorHandler('Arquivo não encontrado', 404, 404);
 
-    // Verificar se o arquivo existe fisicamente
-    if (!fs.existsSync(item.pdfUrl)) {
+    // Verificar se o arquivo existe no storage
+    if (!(await this.fileService.exists(item.pdfUrl))) {
       throw new ErrorHandler('Arquivo não encontrado no servidor', 404, 404);
     }
 
@@ -211,16 +202,23 @@ export class MenuCalculatorService extends CoreService<Menu> {
       }
 
       const filePath = item.pdfUrl;
-      const exists = fs.existsSync(filePath);
+      const size = await this.fileService.getSize(filePath);
 
-      if (!exists) {
+      if (size === null) {
         return { path: filePath, size: 0, exists: false };
       }
 
-      const stats = fs.statSync(filePath);
-      return { path: filePath, size: stats.size, exists: true };
+      return { path: filePath, size, exists: true };
     } catch (error) {
       return { path: '', size: 0, exists: false };
     }
+  }
+
+  async fileExists(filePath: string): Promise<boolean> {
+    return this.fileService.exists(filePath);
+  }
+
+  async readFile(filePath: string): Promise<Buffer> {
+    return this.fileService.getFileByPath(filePath);
   }
 }

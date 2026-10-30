@@ -25,7 +25,6 @@ import { Response } from 'express';
 import { Public } from '../auth/jwt-auth.guard';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { CustomCacheInterceptor } from 'src/core/inteceptors/cache.interceptor';
-import { existsSync } from 'fs';
 
 @Controller('training-sheet')
 export class TrainingSheetController extends CoreController<
@@ -140,7 +139,7 @@ export class TrainingSheetController extends CoreController<
       const fullPath = `${fileConfig.path}${fileConfig.filename}`;
 
       // Verificar se o arquivo existe fisicamente
-      if (!existsSync(fullPath)) {
+      if (!(await this.service.hasFile(+id))) {
         res.status(404).json({ error: 'Arquivo não encontrado no servidor' });
         return;
       }

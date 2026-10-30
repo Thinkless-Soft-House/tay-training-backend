@@ -15,7 +15,6 @@ import {
   Res,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
-import { createReadStream, existsSync, readFileSync, statSync } from 'fs';
 import { MenuCalculatorService } from './menu-calculator.service';
 import { CreateMenuDto } from './dto/create-menu.dto';
 import { UpdateMenuDto } from './dto/update-menu.dto';
@@ -83,37 +82,20 @@ export class MenuCalculatorController extends CoreControllerV2<
     try {
       const filePath = await this.menuCalculatorService.getFilePath(+id);
 
-      // Verificar se o arquivo existe
-      if (!existsSync(filePath)) {
-        res.status(404).send('Arquivo não encontrado');
-        return;
-      }
-
-      // Obter informações do arquivo
-      const stats = statSync(filePath);
+      const fileBuffer = await this.menuCalculatorService.readFile(filePath);
       const fileName = filePath.split('/').pop() || 'arquivo.pdf';
 
       // Configurar headers adequados
       res.set({
         'Content-Type': 'application/pdf',
-        'Content-Length': stats.size.toString(),
+        'Content-Length': fileBuffer.length.toString(),
         'Content-Disposition': `attachment; filename="${fileName}"`,
         'Cache-Control': 'no-cache, no-store, must-revalidate',
         Pragma: 'no-cache',
         Expires: '0',
       });
 
-      const fileStream = createReadStream(filePath);
-
-      // Adicionar tratamento de erro para o stream
-      fileStream.on('error', (error) => {
-        console.error('Erro ao ler arquivo:', error);
-        if (!res.headersSent) {
-          res.status(500).send('Erro interno do servidor');
-        }
-      });
-
-      return new StreamableFile(fileStream);
+      return new StreamableFile(fileBuffer);
     } catch (error) {
       console.error('Erro no getFile:', error);
       if (!res.headersSent) {
@@ -144,20 +126,18 @@ export class MenuCalculatorController extends CoreControllerV2<
 
       const filePath = menu.pdfUrl;
 
-      if (!existsSync(filePath)) {
+      if (!(await this.menuCalculatorService.fileExists(filePath))) {
         return res.status(404).json({
           error: 'Arquivo não encontrado no servidor',
         });
       }
 
-      const stats = statSync(filePath);
       const fileName = filePath.split('/').pop() || 'menu.pdf';
-
-      console.log(`📊 Carregando arquivo: ${stats.size} bytes`);
 
       // ABORDAGEM COM BUFFER: Carrega arquivo inteiro na memória
       // Mais seguro para PDFs pequenos/médios (até ~50MB)
-      const fileBuffer = readFileSync(filePath);
+      const fileBuffer = await this.menuCalculatorService.readFile(filePath);
+      console.log(`📊 Carregando arquivo: ${fileBuffer.length} bytes`);
 
       res.set({
         'Content-Type': 'application/pdf',

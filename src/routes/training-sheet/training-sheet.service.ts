@@ -65,6 +65,10 @@ export class TrainingSheetService extends CoreService<TrainingSheet> {
     return buffer;
   }
 
+  async hasFile(id: number): Promise<boolean> {
+    return this.fileService.exists(`./files/workouts/Treino_${id}.pdf`);
+  }
+
   override createWhere(query: any) {
     const where = {};
     if (query.name) where['name'] = ILike(`%${query.name}%`);
