@@ -31,9 +31,6 @@ let AppController = class AppController {
         console.log('getHello3');
         return this.appService.getHello3();
     }
-    getEnv() {
-        return process.env;
-    }
     getFilesCount() {
         const basePath = './files';
         try {
@@ -78,13 +75,6 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", String)
 ], AppController.prototype, "getHello3", null);
-__decorate([
-    (0, jwt_auth_guard_1.Public)(),
-    (0, common_1.Get)('env'),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Object)
-], AppController.prototype, "getEnv", null);
 __decorate([
     (0, jwt_auth_guard_1.Public)(),
     (0, common_1.Get)('files-count'),

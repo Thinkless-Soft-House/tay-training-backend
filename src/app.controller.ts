@@ -30,12 +30,6 @@ export class AppController {
   }
 
   @Public()
-  @Get('env')
-  getEnv(): Record<string, string | undefined> {
-    return process.env;
-  }
-
-  @Public()
   @Get('files-count')
   getFilesCount(): Record<string, number | string> {
     const basePath = './files';

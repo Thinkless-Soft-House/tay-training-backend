@@ -5,6 +5,5 @@ export declare class AppController {
     getHello(): string;
     getHello2(): string;
     getHello3(): string;
-    getEnv(): Record<string, string | undefined>;
     getFilesCount(): Record<string, number | string>;
 }
